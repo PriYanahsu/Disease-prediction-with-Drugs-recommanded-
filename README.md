@@ -1,27 +1,27 @@
 # Disease Prediction with Drug Recommendation - README
 
-### Overview
+## Overview
 The Disease Prediction with Drug Recommendation is a machine learning project designed to predict diseases based on symptoms and recommend suitable drugs. This project uses Jupyter Notebook for model training and evaluation, while Flask is used to build a web-based interface for real-time predictions and recommendations.
 
-### Features
+## Features
 #### * Model Training: Train a machine learning model in Jupyter Notebook to predict diseases and recommend drugs.
 #### * Interactive Interface: Flask provides a lightweight and user-friendly interface for making predictions.
 #### * Data Visualization: Includes visual insights such as word clouds to represent symptom correlations.
 #### * Simple Deployment: The Flask app runs locally with a single command.
 
-### Technologies Used
+## Technologies Used
 #### 1.Python: Core programming language.
 #### 2.Jupyter Notebook:  For exploratory data analysis (EDA), model training, and evaluation.
 #### 3.Flask: For building the backend and hosting the web interface.
 
-### Libraries:
+## Libraries:
 #### 1.Pandas: Data manipulation and analysis.
 #### 2.Scikit-learn: Model training and evaluation.
 #### 3.NLTK: For text preprocessing (if applicable).
 #### 4.Flask: Web app framework.
 #### 5.WordCloud: To visualize symptom data relationships.
 
-### Project Structure
+## Project Structure
 
 Spam-Message-Detector
 
@@ -36,7 +36,7 @@ Spam-Message-Detector
       6.requirements.txt          # List of Python dependencies
       7.README.md                 # Project documentation (this file)
 
-### How to Run the Project
+## How to Run the Project
 ### 1. Clone the Repository
 Clone the repository to your local machine:
 
