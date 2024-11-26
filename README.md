@@ -68,6 +68,11 @@ Run the flask app with the following command:
 ### 5. Open the App in Your Browser
 After running the above command, Streamlit will start a local server and provide a URL. Open the URL in your browser (default: http://localhost:8501).
 
+## Screenshot
+ #### 1. Login first
+![Screenshot (201)](https://github.com/user-attachments/assets/a77ab938-0ca0-4624-9db0-7e8565a7b843)
+
+
 ## Additional Features
   #### Disease Prediction: Input symptoms to predict the most likely disease.
   #### Drug Recommendation: Get five drug suggestions for the predicted disease.
