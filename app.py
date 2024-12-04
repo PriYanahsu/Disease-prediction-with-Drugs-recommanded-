@@ -102,10 +102,10 @@ def top_drugs_extractor(condition,df):
     # Extract the top 5 drugs for the specified condition
     drug_lst = df_top[df_top['condition'] == condition]['drugName'].head(5).tolist()
     return drug_lst
-    
 
+from app import app
 if __name__ == "__main__":
 
-    app.run(debug=True, host="localhost", port=8080)
+    app.run(debug=True, host="0,0,0,0", port=8080)
 
 # python -m run flask
