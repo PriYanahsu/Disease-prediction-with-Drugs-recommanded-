@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 altair==5.4.1
 anyio==4.4.0
 argon2-cffi==23.1.0
@@ -141,3 +142,13 @@ websocket-client==1.8.0
 Werkzeug==3.0.4
 widgetsnbextension==4.0.13
 wordcloud==1.9.3
+=======
+Flask==2.3.2
+pandas==1.5.3
+numpy==1.24.3
+joblib==1.3.2
+beautifulsoup4==4.12.2
+nltk==3.8.1
+scikit-learn==1.2.2
+gunicorn==21.2.0
+>>>>>>> a032d22e4f7c825fbd9b89072730f0d296690813
