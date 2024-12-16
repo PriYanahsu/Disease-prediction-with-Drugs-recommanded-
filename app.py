@@ -108,4 +108,11 @@ if __name__ == "__main__":
 
     app.run(debug=True, host="localhost", port=8080)
 
-# python -m run flask
+# from waitress import serve
+# from myapp import app  # Replace with the actual name of your Flask app
+
+# if __name__ == "__main__":
+#     server(app, host="0.0.0.0", port=5000)
+
+
+# python -m flask run
