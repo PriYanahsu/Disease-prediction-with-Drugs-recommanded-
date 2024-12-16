@@ -12,11 +12,14 @@
             margin: 0;
             padding: 0;
             font-family: 'Arial', sans-serif;
-            background-color: #e8f5e9; /* Light green background */
+            background-color: #f4f7fc; /* Same background color as home page */
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
         }
 
         .navbar {
-            background-color: #388e3c; /* Dark green for navbar */
+            background-color: #4CAF50; /* Same navbar background as home */
         }
 
         .navbar-brand {
@@ -26,73 +29,60 @@
         }
 
         .form-container {
+            padding: 40px 20px;
             background-color: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            margin-top: 40px;
+            border-radius: 10px;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+            flex: 1; /* Ensures the content area takes up available space */
+            text-align: center;
         }
 
         .form-container h4 {
             font-size: 24px;
-            margin-bottom: 20px;
             font-weight: bold;
-            color: #388e3c; /* Green color for heading */
+            margin-bottom: 20px;
         }
 
         .input-field {
             width: 80%;
-            padding: 12px;
+            padding: 10px;
             font-size: 18px;
-            border: 1px solid #388e3c;
-            border-radius: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
             margin-bottom: 20px;
         }
 
         #submit {
             width: 150px;
             padding: 12px;
-            background-color: #388e3c; /* Green button */
+            background-color: #FF5733;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s;
         }
 
         #submit:hover {
-            background-color: #2c6e2f; /* Darker green on hover */
+            background-color: #c0392b;
         }
 
-        .card-header {
-            background-color: #388e3c; /* Green card header */
-            color: white;
-            font-weight: bold;
-        }
-
-        .card-body {
-            background-color: #ffffff;
-            padding: 30px;
-        }
-
-        .result-text {
-            font-size: 18px;
-            color: #333;
-        }
-
-        .result-card {
+        .card {
             margin-top: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .footer {
-            background-color: #388e3c; /* Green footer */
+            background-color: #08680c;
             color: white;
-            padding: 20px;
+            padding: 30px;
             text-align: center;
-            margin-top: 40px;
+            width: 100%;
+            position: relative;
+            bottom: 0;
         }
 
         .footer ul {
@@ -102,7 +92,7 @@
 
         .footer ul li {
             display: inline;
-            margin-right: 15px;
+            margin-right: 20px;
         }
 
         .footer ul li a {
@@ -147,42 +137,44 @@
         </div>
     </nav>
 
-    <div class="container form-container text-center">
-        <h4>Enter the Medical Issue for Drug Recommendations:</h4>
-        <form method="POST" action='/predict'>
-            <input type="text" id="msg" name="rawtext" class="input-field" placeholder="Enter medical condition..." required>
-            <br>
-            <input type="submit" id="submit" value="Predict">
-        </form>
+    <div class="container">
+        <div class="form-container">
+            <h4>Enter the Medical Issue for Drug Recommendations:</h4>
+            <form method="POST" action='/predict'>
+                <input type="text" id="msg" name="rawtext" class="input-field" placeholder="Enter medical condition..." required>
+                <br>
+                <input type="submit" id="submit" value="Predict">
+            </form>
+        </div>
     </div>
 
     <div class="container">
         <!-- Original Review Card -->
-        <div class="card result-card text-center">
+        <div class="card text-center">
             <div class="card-header">
                 <strong>Original Entered Review:</strong>
             </div>
             <div class="card-body">
-                <p id="new" class="result-text">
+                <p id="new">
                     {{ rawtext }}
                 </p>
             </div>
         </div>
 
         <!-- Predicted Medical Condition Card -->
-        <div class="card result-card text-center">
+        <div class="card text-center">
             <div class="card-header">
                 <strong>Predicted Medical Condition:</strong>
             </div>
             <div class="card-body">
-                <p id="new" class="result-text">
+                <p id="new">
                     {{ result }}
                 </p>
             </div>
         </div>
 
         <!-- Top 5 Recommended Drugs -->
-        <div class="card result-card text-center">
+        <div class="card text-center">
             <div class="card-header">
                 <strong><i class="fas fa-file-export"></i> Top 5 Recommended Drugs:</strong>
             </div>
