@@ -11,76 +11,95 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f4f7fc;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #7ec777, #7ec777);
             display: flex;
             flex-direction: column;
             height: 100vh;
         }
 
         .navbar {
-            background-color: #4CAF50;
+            background: linear-gradient(to right,#43a047 , #43a047);
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .navbar-brand {
-            font-size: 24px;
-            color: white;
+            font-size: 28px;
             font-weight: bold;
+            color: white;
         }
 
         .form-container {
-            padding: 40px 20px;
-            background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.1);
             margin-top: 50px;
-            flex: 1; /* Ensures the content area takes up available space */
+            flex: 1;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .form-container h4 {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
-            margin-bottom: 20px;
+            color: #333;
+            margin-bottom: 30px;
         }
 
         .input-field {
-            width: 80%;
-            padding: 10px;
-            font-size: 18px;
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
             border: 1px solid #ddd;
-            border-radius: 5px;
+            border-radius: 8px;
             margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #43a047;
+            box-shadow: 0 0 8px #43a047(56, 204, 242, 0.6);
+        }
+
+        textarea.input-field {
+            resize: vertical;
         }
 
         #submit {
-            width: 150px;
-            padding: 12px;
+            width: 100%;
+            padding: 14px;
             background-color: #FF5733;
             color: white;
             border: none;
-            border-radius: 5px;
-            font-size: 16px;
+            border-radius: 8px;
+            font-size: 18px;
             cursor: pointer;
             transition: background-color 0.3s;
+            margin-top: 20px;
         }
 
         #submit:hover {
-            background-color: #c0392b;
+            background-color: #e64a19;
         }
 
         .footer {
-            background-color: #08680c;
+            background: #0f7714;
             color: white;
-            padding: 30px;
+            padding: 40px 20px;
             text-align: center;
             width: 100%;
-            position: relative;
             bottom: 0;
+            position: relative;
         }
 
         .footer ul {
             list-style-type: none;
             padding: 0;
+            margin-bottom: 20px;
         }
 
         .footer ul li {
@@ -91,16 +110,23 @@
         .footer ul li a {
             color: white;
             text-decoration: none;
-            font-size: 16px;
+            font-size: 18px;
+            transition: color 0.3s ease;
         }
 
         .footer ul li a:hover {
-            text-decoration: underline;
+            color: #FFD700;
         }
 
         .footer p {
-            font-size: 14px;
+            font-size: 16px;
             margin-top: 20px;
+            opacity: 0.8;
+        }
+
+        .container {
+            max-width: 90%;
+            padding: 20px;
         }
     </style>
 </head>
@@ -114,9 +140,26 @@
 
     <div class="container">
         <div class="form-container text-center">
-            <h4>Enter Your Medical Condition to Get Drug Recommendations</h4>
+            <h4>Enter Your Details for Drug Recommendations Based on Your Health</h4>
             <form method="POST" action='/predict'>
-                <input type="text" id="msg" name="rawtext" class="input-field" placeholder="Enter medical condition..." required>
+                <input type="text" id="name" name="name" class="input-field" placeholder="Enter your name..." required>
+                <br>
+                <input type="number" id="age" name="age" class="input-field" placeholder="Enter your age..." required>
+                <br>
+                <select id="gender" name="gender" class="input-field" required>
+                    <option value="" disabled selected>Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+                <br>
+                <input type="number" id="height" name="height" class="input-field" placeholder="Height in cm..." required>
+                <br>
+                <input type="number" id="weight" name="weight" class="input-field" placeholder="Weight in kg..." required>
+                <br>
+                <input type="text" id="location" name="location" class="input-field" placeholder="Enter your location..." required>
+                <br>
+                <textarea id="msg" name="rawtext" class="input-field" placeholder="Describe problems during any activity..." required rows="4"></textarea>
                 <br>
                 <input type="submit" id="submit" value="Predict">
             </form>
@@ -131,11 +174,10 @@
             <li class="nav-item"><a href="#" class="nav-link">FAQs</a></li>
             <li class="nav-item"><a href="#" class="nav-link">About</a></li>
         </ul>
-        <p>©PriyanshSingh</p>
+        <p>©Priyanshu</p>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
-
