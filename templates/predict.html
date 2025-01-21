@@ -13,13 +13,14 @@
             padding: 0;
             font-family: 'Arial', sans-serif;
             background: url('/static/LoginIMG.jpg') no-repeat center center fixed;
+            background-size: cover;
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            min-height: 100vh;
         }
 
         .navbar {
-            background: rgba(51, 51, 51, 0.8); /* Add transparency to navbar */
+            background: rgba(51, 51, 51, 0.9);
         }
 
         .navbar-brand {
@@ -28,13 +29,22 @@
             font-weight: bold;
         }
 
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
         .form-container {
             padding: 40px 20px;
-            background: rgba(255, 255, 255, 0.9); /* Add transparency to form background */
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 10px;
             box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
-            margin-top: 50px;
-            flex: 1; /* Ensures the content area takes up available space */
+            width: 100%;
+            max-width: 600px;
             text-align: center;
         }
 
@@ -45,8 +55,8 @@
         }
 
         .input-field {
-            width: 80%;
-            padding: 10px;
+            width: 90%;
+            padding: 12px;
             font-size: 18px;
             border: 1px solid #ddd;
             border-radius: 5px;
@@ -75,14 +85,29 @@
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
         }
 
+        .drug-recommendations {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .drug-recommendations p {
+            background-color: #43a047;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+        }
+
         .footer {
             background-color: #333333;
             color: white;
             padding: 30px;
             text-align: center;
             width: 100%;
-            position: relative;
-            bottom: 0;
         }
 
         .footer ul {
@@ -109,29 +134,11 @@
             font-size: 14px;
             margin-top: 20px;
         }
-
-        .drug-recommendations {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .drug-recommendations p {
-            background-color: #43a047; /* Green for drug recommendations */
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 16px;
-            text-align: center;
-            width: auto;
-        }
     </style>
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Condition-Based Drug Prediction Using ML</a>
         </div>
@@ -139,44 +146,36 @@
 
     <div class="container">
         <div class="form-container">
-            <h4>Describe problems during any activity for futher problems...</h4>
+            <h4>Describe problems during any activity for further prediction...</h4>
             <form method="POST" action='/predict'>
                 <input type="text" id="msg" name="rawtext" class="input-field" placeholder="Enter medical condition..." required>
                 <br>
                 <input type="submit" id="submit" value="Predict">
             </form>
         </div>
-    </div>
 
-    <div class="container">
-        <!-- Original Review Card -->
+        <!-- Cards Section -->
         <div class="card text-center">
             <div class="card-header">
                 <strong>Original Entered Review:</strong>
             </div>
             <div class="card-body">
-                <p id="new">
-                    {{ rawtext }}
-                </p>
+                <p id="new">{{ rawtext }}</p>
             </div>
         </div>
 
-        <!-- Predicted Medical Condition Card -->
         <div class="card text-center">
             <div class="card-header">
                 <strong>Predicted Medical Condition:</strong>
             </div>
             <div class="card-body">
-                <p id="new">
-                    {{ result }}
-                </p>
+                <p id="new">{{ result }}</p>
             </div>
         </div>
 
-        <!-- Top 5 Recommended Drugs -->
         <div class="card text-center">
             <div class="card-header">
-                <strong><i class="fas fa-file-export"></i> Top 5 Recommended Drugs:</strong>
+                <strong>Top 5 Recommended Drugs:</strong>
             </div>
             <div class="card-body">
                 <div class="drug-recommendations">
@@ -196,7 +195,7 @@
             <li class="nav-item"><a href="#" class="nav-link">FAQs</a></li>
             <li class="nav-item"><a href="#" class="nav-link">About</a></li>
         </ul>
-        <p>©PriyanshSingh</p>
+        <p>&copy;PriyanshSingh</p>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
