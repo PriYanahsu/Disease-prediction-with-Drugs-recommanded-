@@ -34,18 +34,19 @@
             right: 0;
             bottom: 0;
             left: 0;
-            background: linear-gradient(45deg, #e91e63, #2196f3, #4caf50, #ffeb3b);
-            background-size: 400% 400%;
-            animation: gradientBG 10s ease infinite;
+            background: url('static/loginn1.jpg') no-repeat center center;
+            background-size: cover;
         }
 
         @keyframes gradientBG {
             0% {
                 background-position: 0% 50%;
             }
+
             50% {
                 background-position: 100% 50%;
             }
+
             100% {
                 background-position: 0% 50%;
             }
@@ -89,9 +90,11 @@
             0% {
                 color: #4caf50;
             }
+
             50% {
                 color: #e91e63;
             }
+
             100% {
                 color: #2196f3;
             }
@@ -126,8 +129,8 @@
             transition: all 0.2s;
         }
 
-        .form-signin .form-control:focus + label,
-        .form-signin .form-control:not(:placeholder-shown) + label {
+        .form-signin .form-control:focus+label,
+        .form-signin .form-control:not(:placeholder-shown)+label {
             top: 5px;
             left: 8px;
             font-size: 0.8rem;
@@ -188,12 +191,14 @@
 
         <form class="login" method="POST" action="/login.validation">
             <div class="form-floating">
-                <input type="email" class="form-control" name="username" id="floatingInput" size="30" placeholder="priyanshu@example.com" required>
+                <input type="email" class="form-control" name="username" id="floatingInput" size="30"
+                    placeholder="priyanshu@example.com" required>
                 <label for="floatingInput"></label>
             </div>
 
             <div class="form-floating">
-                <input type="password" class="form-control" name="password" id="floatingPassword" size="30" placeholder="Password" required>
+                <input type="password" class="form-control" name="password" id="floatingPassword" size="30"
+                    placeholder="Password" required>
                 <label for="floatingPassword"></label>
             </div>
 
