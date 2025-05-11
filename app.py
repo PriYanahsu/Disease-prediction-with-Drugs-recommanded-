@@ -14,9 +14,9 @@ app = Flask(__name__)
 
 app.secret_key=os.urandom(24)
 
-Model_Path = 'model/passmodel2.pkl'
+Model_Path = 'model/passmodel.pkl'
 
-TOKENIZER_PATH = 'model/tfidfvectorizer2.pkl'
+TOKENIZER_PATH = 'model/tfidfvectorizer.pkl'
 
 DATA_PATH = 'data/drugsComTrain_raw.csv'
 
@@ -52,7 +52,7 @@ def login_validation():
 
     session['user_id']= username
 
-    if username=="admin@gmail.com" and password =="admin":
+    if username=="priyansh@gmail.com" and password =="priyansh":
         return render_template('home.html')
     
     else:
