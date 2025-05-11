@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tested Cases</title>
+    <style>
+        table {
+            width: 90%;
+            margin: auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #999;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #d9d9d9;
+        }
+    </style>
+</head>
+<body>
+    <h2 style="text-align:center;">Previously Tested Cases</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>User Input</th>
+                <th>Predicted Condition</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for case in tested_cases %}
+            <tr>
+                <td>{{ case.timestamp }}</td>
+                <td>{{ case.input }}</td>
+                <td>{{ case.predicted_condition }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

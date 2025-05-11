@@ -1,0 +1,3 @@
+timestamp,input,predicted_condition
+2025-05-12 00:28:07,"""I’ve been feeling very tired all the time, and I often experience extreme thirst and frequent urination. I’ve also noticed that I have trouble healing wounds and I’m losing weight without trying.""","Diabetes, Type 2"
+2025-05-12 00:29:12,"""I’ve been feeling very tired all the time, and I often experience extreme thirst and frequent urination. I’ve also noticed that I have trouble healing wounds and I’m losing weight without trying.""","Diabetes, Type 2"

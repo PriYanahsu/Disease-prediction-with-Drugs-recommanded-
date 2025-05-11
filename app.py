@@ -1,4 +1,4 @@
-from flask import Flask, render_template,request,redirect,session
+from flask import Flask, render_template, request, redirect, session
 import os
 import joblib
 import pandas as pd
@@ -7,25 +7,26 @@ import numpy as np
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 from bs4 import BeautifulSoup
-
-HTML_WRAPPER = """<div style="overflow-x: auto; border: 1px solid #e6e9ef; border-radius:0.25rem; padding: 1rem">{}</div>"""
+from datetime import datetime
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 
-app.secret_key=os.urandom(24)
-
-Model_Path = 'model/passmodel.pkl'
-
-TOKENIZER_PATH = 'model/tfidfvectorizer.pkl'
-
+# === Paths ===
+MODEL_PATH = 'model/passmodel3.pkl'
+TOKENIZER_PATH = 'model/tfidfvectorizer3.pkl'
 DATA_PATH = 'data/drugsComTrain_raw.csv'
+LOG_PATH = 'data/tested_cases.csv'  # <-- path to store tested inputs
 
+# === Load model and vectorizer ===
+model = joblib.load(MODEL_PATH)
 vectorizer = joblib.load(TOKENIZER_PATH)
 
-model = joblib.load(Model_Path)
-
+# === NLP Setup ===
 stop = stopwords.words('english')
 lemmatizer = WordNetLemmatizer()
+
+# === Routes ===
 
 @app.route('/')
 def login():
@@ -39,80 +40,92 @@ def logout():
 @app.route('/index')
 def index():
     if 'user_id' in session:
-
         return render_template('home.html')
-    
     else:
         return redirect('/')
-    
+
 @app.route('/login.validation', methods=['POST'])
 def login_validation():
     username = request.form.get('username')
     password = request.form.get('password')
 
-    session['user_id']= username
+    session['user_id'] = username
 
-    if username=="priyansh@gmail.com" and password =="priyansh":
+    if username == "priyansh@gmail.com" and password == "priyansh":
         return render_template('home.html')
-    
     else:
-        err="Priyanshu caught you"
+        err = "Priyanshu caught you"
         return render_template('login.html', lbl=err)
-    
-    return ""
 
-@app.route('/predict', methods=["GET","POST"])
+@app.route('/predict', methods=["GET", "POST"])
 def predict():
     if request.method == "POST":
-        raw_text = request.form['rawtext']
+        raw_text = request.form.get('rawtext', '')
 
-        if raw_text != "":
-            clean_text = cleanText(raw_text)
-            clean_lst = [clean_text]
+        if raw_text.strip() == "":
+            return render_template('predict.html', rawtext="No input provided", result="None", top_drugs=[])
 
-            tfidf_vect = vectorizer.transform(clean_lst)
-            prediction = model.predict(tfidf_vect)
-            predicted_cond = prediction[0]
-            df = pd.read_csv(DATA_PATH)
-            top_drugs = top_drugs_extractor(predicted_cond,df)
+        clean_text = cleanText(raw_text)
+        clean_lst = [clean_text]
 
-            return render_template('predict.html', rawtext= raw_text, result = predicted_cond, top_drugs = top_drugs)
-        
-        else:
-            raw_text = "There is no text selected"
+        # Vectorize and predict
+        tfidf_vect = vectorizer.transform(clean_lst)
+        prediction = model.predict(tfidf_vect)
+        predicted_cond = prediction[0]
+
+        # Load drug data and extract top drugs
+        df = pd.read_csv(DATA_PATH)
+        top_drugs = top_drugs_extractor(predicted_cond, df)
+
+        # Save tested input to CSV
+        save_tested_case(raw_text, predicted_cond)
+
+        return render_template('predict.html', rawtext=raw_text, result=predicted_cond, top_drugs=top_drugs)
+
+    return redirect('/index')
+
+
+@app.route('/view_tests')
+def view_tests():
+    if not os.path.exists(LOG_PATH):
+        tested_cases = []
+    else:
+        df_log = pd.read_csv(LOG_PATH)
+        tested_cases = df_log.to_dict(orient='records')
+    return render_template('view_tests.html', tested_cases=tested_cases)
+
+
+# === Helpers ===
 
 def cleanText(raw_review):
-    # delte HTML
     review_text = BeautifulSoup(raw_review, 'html.parser').get_text()
-    # Make space
     letters_only = re.sub('[^a-zA-Z]', ' ', review_text)
-    # lower letter
     words = letters_only.lower().split()
-    # Stopwords
-    meaningful_words = [w for w in words if not w in stop]
-    # lemmitizer
-    lemmitize_words = [lemmatizer.lemmatize(w) for w in meaningful_words]
-    # space join words
-    return(' '.join(lemmitize_words))
+    meaningful_words = [w for w in words if w not in stop]
+    lemmatized_words = [lemmatizer.lemmatize(w) for w in meaningful_words]
+    return ' '.join(lemmatized_words)
 
-def top_drugs_extractor(condition,df):
-    # Filter the DataFrame based on rating and usefulCount
+def top_drugs_extractor(condition, df):
     df_top = df[(df['rating'] >= 9) & (df['usefulCount'] >= 100)].sort_values(by=['rating', 'usefulCount'], ascending=[False, False])
-    
-    # Extract the top 5 drugs for the specified condition
     drug_lst = df_top[df_top['condition'] == condition]['drugName'].head(5).tolist()
     return drug_lst
 
-from app import app
+def save_tested_case(sentence, condition):
+    log_entry = pd.DataFrame([{
+        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'input': sentence,
+        'predicted_condition': condition
+    }])
+    
+    if os.path.exists(LOG_PATH):
+        existing = pd.read_csv(LOG_PATH)
+        combined = pd.concat([existing, log_entry], ignore_index=True)
+    else:
+        combined = log_entry
+    
+    combined.to_csv(LOG_PATH, index=False)
+
+# === Run Server ===
+
 if __name__ == "__main__":
-
     app.run(debug=True, host="localhost", port=8080)
-
-# from waitress import serve
-# from myapp import app  # Replace with the actual name of your Flask app
-
-# if __name__ == "__main__":
-#     server(app, host="0.0.0.0", port=5000)
-
-
-# python -m flask run
