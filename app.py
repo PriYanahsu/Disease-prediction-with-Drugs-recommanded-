@@ -94,6 +94,11 @@ def view_tests():
         tested_cases = df_log.to_dict(orient='records')
     return render_template('view_tests.html', tested_cases=tested_cases)
 
+@app.route('/home')
+def homepage():
+    return render_template('home.html')
+
+
 
 # === Helpers ===
 
