@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, json
 import os
 import joblib
 import pandas as pd
@@ -8,6 +8,8 @@ from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 from bs4 import BeautifulSoup
 from datetime import datetime
+from collections import Counter
+
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -87,6 +89,7 @@ def predict():
 
 @app.route('/view_tests')
 def view_tests():
+    # Check if file exists before loading it
     if not os.path.exists(LOG_PATH):
         tested_cases = []
     else:
@@ -94,10 +97,50 @@ def view_tests():
         tested_cases = df_log.to_dict(orient='records')
     return render_template('view_tests.html', tested_cases=tested_cases)
 
+@app.route('/analytics')
+def analytics():
+    try:
+        # Try reading the CSV log file
+        if os.path.exists(LOG_PATH):
+            df = pd.read_csv(LOG_PATH)  # Your CSV log file
+        else:
+            df = pd.DataFrame()  # If file does not exist, return empty DataFrame
+            print(f"File not found: {LOG_PATH}")
+
+        # Prepare data for charts
+        conditions = df['predicted_condition'].tolist() if not df.empty else []
+        condition_counts = dict(Counter(conditions))
+
+        drugs = []
+        if 'top_drugs' in df.columns and not df.empty:
+            for drug_list in df['top_drugs']:
+                drugs.extend([d.strip() for d in str(drug_list).split(',')])
+        drug_counts = dict(Counter(drugs))
+
+        timestamps = pd.to_datetime(df['timestamp']) if not df.empty else pd.Series()
+        daily_counts = timestamps.dt.date.value_counts().sort_index() if not df.empty else {}
+
+        # Convert datetime.date keys to string format (YYYY-MM-DD)
+        daily_counts_dict = {str(key): value for key, value in daily_counts.items()}
+
+        # Ensure that data passed to the template is valid
+        print(f"Condition Counts: {condition_counts}")
+        print(f"Drug Counts: {drug_counts}")
+        print(f"Daily Counts: {daily_counts_dict}")
+
+        return render_template("analytics.html",
+                               condition_counts=json.dumps(condition_counts),
+                               drug_counts=json.dumps(drug_counts),
+                               daily_counts=json.dumps(daily_counts_dict))
+
+    except Exception as e:
+        print(f"Error processing analytics: {e}")
+        return render_template("analytics.html", condition_counts={}, drug_counts={}, daily_counts={})
+
+
 @app.route('/home')
 def homepage():
     return render_template('home.html')
-
 
 
 # === Helpers ===
@@ -122,13 +165,18 @@ def save_tested_case(sentence, condition):
         'predicted_condition': condition
     }])
     
+    # Check if file exists and append or create a new file
     if os.path.exists(LOG_PATH):
         existing = pd.read_csv(LOG_PATH)
         combined = pd.concat([existing, log_entry], ignore_index=True)
     else:
         combined = log_entry
     
-    combined.to_csv(LOG_PATH, index=False)
+    try:
+        combined.to_csv(LOG_PATH, index=False)
+        print(f"Successfully saved to {LOG_PATH}")
+    except Exception as e:
+        print(f"Error saving to CSV: {e}")
 
 # === Run Server ===
 

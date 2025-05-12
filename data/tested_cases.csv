@@ -37,3 +37,5 @@ timestamp,input,predicted_condition
 2025-05-12 13:09:47,"    ""My doctor said my blood sugar levels are high. I also have frequent urination issues."",","Diabetes, Type 2"
 2025-05-12 13:10:03,"    ""Lately, I've had chest pains and a pounding sensation in my head. The doctor suspects hypertension."",",High Blood Pressure
 2025-05-12 13:14:46,"""I’ve noticed that I feel really thirsty throughout the day, and even though I drink a lot of water, I can’t seem to shake off this dry mouth. I’ve also been feeling a bit more irritable and fatigued than usual.""",Depression
+2025-05-12 13:28:07,the problem in moving,Depression
+2025-05-12 13:31:41,the problems in mocing and nayalisation,Depression
