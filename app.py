@@ -13,8 +13,8 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
 # === Paths ===
-MODEL_PATH = 'model/passmodel3.pkl'
-TOKENIZER_PATH = 'model/tfidfvectorizer3.pkl'
+MODEL_PATH = 'model/passmodel.pkl'
+TOKENIZER_PATH = 'model/tfidfvectorizer.pkl'
 DATA_PATH = 'data/drugsComTrain_raw.csv'
 LOG_PATH = 'data/tested_cases.csv'  # <-- path to store tested inputs
 
