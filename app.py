@@ -9,6 +9,7 @@ from nltk.corpus import stopwords
 from bs4 import BeautifulSoup
 from datetime import datetime
 from collections import Counter
+from collections import defaultdict
 
 
 app = Flask(__name__)
