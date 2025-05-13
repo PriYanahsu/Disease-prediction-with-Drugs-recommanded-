@@ -15,8 +15,8 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
 # === Paths ===
-MODEL_PATH = 'model/passmodel.pkl'
-TOKENIZER_PATH = 'model/tfidfvectorizer.pkl'
+MODEL_PATH = 'model/passmodelAce.pkl'
+TOKENIZER_PATH = 'model/tfidfvectorizerAce.pkl'
 DATA_PATH = 'data/drugsComTrain_raw.csv'
 LOG_PATH = 'data/tested_cases.csv'  # <-- path to store tested inputs
 
@@ -97,45 +97,48 @@ def view_tests():
         tested_cases = df_log.to_dict(orient='records')
     return render_template('view_tests.html', tested_cases=tested_cases)
 
+
 @app.route('/analytics')
 def analytics():
     try:
-        # Try reading the CSV log file
+        # Load log file if it exists
         if os.path.exists(LOG_PATH):
-            df = pd.read_csv(LOG_PATH)  # Your CSV log file
+            df = pd.read_csv(LOG_PATH)
         else:
-            df = pd.DataFrame()  # If file does not exist, return empty DataFrame
+            df = pd.DataFrame()
             print(f"File not found: {LOG_PATH}")
 
-        # Prepare data for charts
-        conditions = df['predicted_condition'].tolist() if not df.empty else []
-        condition_counts = dict(Counter(conditions))
-
+        # Prepare data
+        condition_counts = dict(Counter(df['predicted_condition'].tolist())) if not df.empty else {}
+        
         drugs = []
         if 'top_drugs' in df.columns and not df.empty:
             for drug_list in df['top_drugs']:
                 drugs.extend([d.strip() for d in str(drug_list).split(',')])
-        drug_counts = dict(Counter(drugs))
+        drug_counts = dict(Counter(drugs)) if drugs else {}
 
-        timestamps = pd.to_datetime(df['timestamp']) if not df.empty else pd.Series()
+        timestamps = pd.to_datetime(df['timestamp'], errors='coerce') if not df.empty else pd.Series()
         daily_counts = timestamps.dt.date.value_counts().sort_index() if not df.empty else {}
 
-        # Convert datetime.date keys to string format (YYYY-MM-DD)
+        # Convert datetime keys to strings
         daily_counts_dict = {str(key): value for key, value in daily_counts.items()}
 
-        # Ensure that data passed to the template is valid
+        # Log output for debugging
         print(f"Condition Counts: {condition_counts}")
         print(f"Drug Counts: {drug_counts}")
         print(f"Daily Counts: {daily_counts_dict}")
 
         return render_template("analytics.html",
-                               condition_counts=json.dumps(condition_counts),
-                               drug_counts=json.dumps(drug_counts),
-                               daily_counts=json.dumps(daily_counts_dict))
+                               condition_counts=condition_counts,
+                               drug_counts=drug_counts,
+                               daily_counts=daily_counts_dict)
 
     except Exception as e:
         print(f"Error processing analytics: {e}")
-        return render_template("analytics.html", condition_counts={}, drug_counts={}, daily_counts={})
+        return render_template("analytics.html",
+                               condition_counts={},
+                               drug_counts={},
+                               daily_counts={})
 
 
 @app.route('/home')

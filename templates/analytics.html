@@ -85,6 +85,17 @@
             font-size: 18px;
             color: #333;
             font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .card ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .card li {
+            margin-bottom: 6px;
+            font-size: 14px;
         }
 
         .card p {
@@ -102,7 +113,6 @@
             text-decoration: none;
             border-radius: 5px;
             font-weight: 600;
-            margin-top: 20px;
             transition: background-color 0.3s ease;
         }
 
@@ -116,9 +126,7 @@
                 flex-direction: column;
                 gap: 20px;
             }
-        }
 
-        @media (max-width: 480px) {
             .card {
                 width: 100%;
             }
@@ -155,45 +163,108 @@
 
     <div class="chart-container">
         <h3>Condition Counts</h3>
-        <pre id="conditionChartText"></pre>
+        <canvas id="conditionChart"></canvas>
     </div>
 
     <div class="chart-container">
         <h3>Drug Counts</h3>
-        <pre id="drugChartText"></pre>
+        <canvas id="drugChart"></canvas>
     </div>
 
     <div class="chart-container">
-        <h3>Daily Counts</h3>
-        <pre id="dailyChartText"></pre>
+        <h3>Daily Activity</h3>
+        <canvas id="dailyChart"></canvas>
     </div>
 
     <script>
-        const conditionCounts = JSON.parse('{{ condition_counts | tojson }}');
-        const drugCounts = JSON.parse('{{ drug_counts | tojson }}');
-        const dailyCounts = JSON.parse('{{ daily_counts | tojson }}');
+        const conditionCounts = {{ condition_counts | tojson }};
+        const drugCounts = {{ drug_counts | tojson }};
+        const dailyCounts = {{ daily_counts | tojson }};
 
         console.log('Condition Counts:', conditionCounts);
         console.log('Drug Counts:', drugCounts);
         console.log('Daily Counts:', dailyCounts);
 
-        // Update the overview cards dynamically
-        document.getElementById('condition-count').innerHTML = Object.entries(conditionCounts).map(([key, value]) => 
-            `<li><strong>${key}</strong>: ${value}</li>`
-        ).join('');
-        
-        document.getElementById('drug-count').innerHTML = Object.entries(drugCounts).map(([key, value]) => 
-            `<li><strong>${key}</strong>: ${value}</li>`
-        ).join('');
-        
-        document.getElementById('daily-count').innerHTML = Object.entries(dailyCounts).map(([key, value]) => 
-            `<li><strong>${key}</strong>: ${value}</li>`
-        ).join('');
+        // Update overview cards
+        document.getElementById('condition-count').innerHTML =
+            Object.entries(conditionCounts).map(([key, value]) =>
+                `<li><strong>${key}</strong>: ${value}</li>`
+            ).join('') || "<li>No condition data available</li>";
 
-        // Display data in textual form (replacing the graphs)
-        document.getElementById('conditionChartText').textContent = JSON.stringify(conditionCounts, null, 2);
-        document.getElementById('drugChartText').textContent = JSON.stringify(drugCounts, null, 2);
-        document.getElementById('dailyChartText').textContent = JSON.stringify(dailyCounts, null, 2);
+        document.getElementById('drug-count').innerHTML =
+            Object.entries(drugCounts).map(([key, value]) =>
+                `<li><strong>${key}</strong>: ${value}</li>`
+            ).join('') || "<li>No drug data available</li>";
+
+        document.getElementById('daily-count').innerHTML =
+            Object.entries(dailyCounts).map(([key, value]) =>
+                `<li><strong>${key}</strong>: ${value}</li>`
+            ).join('') || "<li>No daily activity data available</li>";
+
+        // Condition Chart
+        new Chart(document.getElementById("conditionChart"), {
+            type: 'bar',
+            data: {
+                labels: Object.keys(conditionCounts),
+                datasets: [{
+                    label: 'Condition Count',
+                    data: Object.values(conditionCounts),
+                    backgroundColor: '#4b8e8d'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // Drug Chart
+        new Chart(document.getElementById("drugChart"), {
+            type: 'bar',
+            data: {
+                labels: Object.keys(drugCounts),
+                datasets: [{
+                    label: 'Drug Count',
+                    data: Object.values(drugCounts),
+                    backgroundColor: '#f29e4c'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // Daily Activity Chart
+        new Chart(document.getElementById("dailyChart"), {
+            type: 'line',
+            data: {
+                labels: Object.keys(dailyCounts),
+                datasets: [{
+                    label: 'Daily Count',
+                    data: Object.values(dailyCounts),
+                    fill: false,
+                    borderColor: '#6a4c93',
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
     </script>
 </body>
 
