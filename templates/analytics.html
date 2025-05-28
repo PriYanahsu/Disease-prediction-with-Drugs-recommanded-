@@ -104,7 +104,6 @@
             font-weight: 700;
         }
 
-        /* Style for Buttons and Links */
         .button {
             display: inline-block;
             background-color: #4b8e8d;
@@ -148,15 +147,8 @@
             </ul>
         </div>
         <div class="card">
-            <h4>Top Drugs Overview</h4>
-            <ul id="drug-count">
-                <!-- Drugs will be listed here -->
-            </ul>
-        </div>
-        <div class="card">
             <h4>Daily Activity Overview</h4>
             <ul id="daily-count">
-                <!-- Daily counts will be listed here -->
             </ul>
         </div>
     </div>
@@ -167,41 +159,27 @@
     </div>
 
     <div class="chart-container">
-        <h3>Drug Counts</h3>
-        <canvas id="drugChart"></canvas>
-    </div>
-
-    <div class="chart-container">
         <h3>Daily Activity</h3>
         <canvas id="dailyChart"></canvas>
     </div>
 
     <script>
         const conditionCounts = {{ condition_counts | tojson }};
-        const drugCounts = {{ drug_counts | tojson }};
         const dailyCounts = {{ daily_counts | tojson }};
 
         console.log('Condition Counts:', conditionCounts);
-        console.log('Drug Counts:', drugCounts);
         console.log('Daily Counts:', dailyCounts);
 
-        // Update overview cards
         document.getElementById('condition-count').innerHTML =
             Object.entries(conditionCounts).map(([key, value]) =>
                 `<li><strong>${key}</strong>: ${value}</li>`
             ).join('') || "<li>No condition data available</li>";
-
-        document.getElementById('drug-count').innerHTML =
-            Object.entries(drugCounts).map(([key, value]) =>
-                `<li><strong>${key}</strong>: ${value}</li>`
-            ).join('') || "<li>No drug data available</li>";
 
         document.getElementById('daily-count').innerHTML =
             Object.entries(dailyCounts).map(([key, value]) =>
                 `<li><strong>${key}</strong>: ${value}</li>`
             ).join('') || "<li>No daily activity data available</li>";
 
-        // Condition Chart
         new Chart(document.getElementById("conditionChart"), {
             type: 'bar',
             data: {
@@ -223,29 +201,7 @@
             }
         });
 
-        // Drug Chart
-        new Chart(document.getElementById("drugChart"), {
-            type: 'bar',
-            data: {
-                labels: Object.keys(drugCounts),
-                datasets: [{
-                    label: 'Drug Count',
-                    data: Object.values(drugCounts),
-                    backgroundColor: '#f29e4c'
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            }
-        });
 
-        // Daily Activity Chart
         new Chart(document.getElementById("dailyChart"), {
             type: 'line',
             data: {

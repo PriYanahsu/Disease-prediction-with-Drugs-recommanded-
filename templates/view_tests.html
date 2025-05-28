@@ -129,24 +129,40 @@
     </nav>
 
     <h2>Previously Tested Cases</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Timestamp</th>
-                <th>User Input</th>
-                <th>Predicted Condition</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for case in tested_cases %}
-            <tr>
-                <td>{{ case.timestamp }}</td>
-                <td>{{ case.input }}</td>
-                <td>{{ case.predicted_condition }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Add columns for name, age, gender, height, weight, location -->
+
+<table>
+    <thead>
+        <tr>
+            <th>Timestamp</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>Height (cm)</th>
+            <th>Weight (kg)</th>
+            <th>Location</th>
+            <th>User Input</th>
+            <th>Predicted Condition</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% set prev_case = namespace(timestamp="", name="", age="", gender="", height="", weight="", location="") %}
+        {% for case in tested_cases %}
+        <tr>
+            <td>{% if case.timestamp != "nan" %}{% set prev_case.timestamp = case.timestamp %}{{ case.timestamp }}{% else %}{{ prev_case.timestamp }}{% endif %}</td>
+            <td>{% if case.name != "nan" %}{% set prev_case.name = case.name %}{{ case.name }}{% else %}{{ prev_case.name }}{% endif %}</td>
+            <td>{% if case.age != "nan" %}{% set prev_case.age = case.age %}{{ case.age }}{% else %}{{ prev_case.age }}{% endif %}</td>
+            <td>{% if case.gender != "nan" %}{% set prev_case.gender = case.gender %}{{ case.gender }}{% else %}{{ prev_case.gender }}{% endif %}</td>
+            <td>{% if case.height != "nan" %}{% set prev_case.height = case.height %}{{ case.height }}{% else %}{{ prev_case.height }}{% endif %}</td>
+            <td>{% if case.weight !=  "nan"%}{% set prev_case.weight = case.weight %}{{ case.weight }}{% else %}{{ prev_case.weight }}{% endif %}</td>
+            <td>{% if case.location != "nan" %}{% set prev_case.location = case.location %}{{ case.location }}{% else %}{{ prev_case.location }}{% endif %}</td>
+            <td>{{ case.input }}</td>
+            <td>{{ case.predicted_condition }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
     
 
     <div class="footer">

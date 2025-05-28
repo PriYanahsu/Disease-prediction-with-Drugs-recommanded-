@@ -1,17 +1,28 @@
-timestamp,input,predicted_condition
-2025-05-12 13:05:13," ""I've been easily distracted and unable to focus on tasks lately. By mind keeps wandering."",","Diabetes, Type 2"
-2025-05-12 13:06:18,"""I’ve been feeling very tired all the time, and I often experience extreme thirst and frequent urination. I’ve also noticed that I have trouble healing wounds and I’m losing weight without trying.""","Diabetes, Type 2"
-2025-05-12 13:07:06,"    ""I feel hopeless and tired all the time. Nothing seems to make me happy anymore."",","Diabetes, Type 2"
-2025-05-12 13:07:23,"    ""My blood pressure readings have been consistently high despite my diet."",","Diabetes, Type 2"
-2025-05-12 13:08:29,"""Lately I've been experiencing frequent headaches and blurred vision.""",Depression
-2025-05-12 13:08:38,"""I’ve been experiencing frequent thirst and hunger, no matter how much I eat or drink, and I’m often feeling tired even after a full night’s rest. My weight has been fluctuating, and I’m concerned about my overall health.""","Diabetes, Type 2"
-2025-05-12 13:08:49,"""I constantly feel sad, hopeless, and have lost interest in daily activities.""",Depression
-2025-05-12 13:08:55,"""I’ve noticed that I feel really thirsty throughout the day, and even though I drink a lot of water, I can’t seem to shake off this dry mouth. I’ve also been feeling a bit more irritable and fatigued than usual.""",Depression
-2025-05-12 13:09:15,"    ""I have trouble organizing things and often forget important dates or appointments."",",ADHD
-2025-05-12 13:09:31,"    ""I feel hopeless and tired all the time. Nothing seems to make me happy anymore."",",Depression
-2025-05-12 13:09:47,"    ""My doctor said my blood sugar levels are high. I also have frequent urination issues."",","Diabetes, Type 2"
-2025-05-12 13:10:03,"    ""Lately, I've had chest pains and a pounding sensation in my head. The doctor suspects hypertension."",",High Blood Pressure
-2025-05-12 13:14:46,"""I’ve noticed that I feel really thirsty throughout the day, and even though I drink a lot of water, I can’t seem to shake off this dry mouth. I’ve also been feeling a bit more irritable and fatigued than usual.""",Depression
-2025-05-14 11:45:15,"Lately, I’ve been feeling really tired, even after a full night’s sleep. I often get headaches, especially at the back of my head, and sometimes I feel dizzy when I stand up too quickly. I’ve also noticed my heart beating faster than normal even when I’m just sitting",Depression
-2025-05-14 11:49:26,having skill redness and painful during the wash of face more skin,Acne
-2025-05-14 12:10:12,having skill redness and painful during the wash of face more skin,Acne
+timestamp,input,predicted_condition,name,age,gender,height,weight,location
+2025-05-28 23:36:29,"'ve been feeling extremely down for weeks, I can't sleep properly and nothing feels enjoyable anymore. I feel tired all the time.",Depression,Priyanshu Kumar,21.0,Male,183.0,80.0,"Lucknow, Uttar Pradesh"
+2025-05-29 00:00:09,"""I feel very thirsty, urinate frequently, and have blurred vision despite drinking water.""",High Blood Pressure,,,,,,
+2025-05-29 00:02:52,"""I feel very thirsty, urinate frequently, and have blurred vision despite drinking water.""","Diabetes, Type 2",,,,,,
+2025-05-29 00:03:37,"""I have red pimples on my face, oily skin, and occasional pain when touching them.""",Acne,,,,,,
+2025-05-29 00:03:49,"""I feel hopeless, tired all the time, and have lost interest in things I used to enjoy.""",Depression,,,,,,
+2025-05-29 00:04:11,"""I get frequent headaches, dizziness, and sometimes chest pain.""",High Blood Pressure,,,,,,
+2025-05-29 00:04:27,"""I struggle to focus, forget things easily, and feel restless most of the time.""",ADHD,,,,,,
+2025-05-06 10:15:00,"""My skin is breaking out with painful cysts, especially around my chin and forehead.""",Acne,,,,,,
+2025-05-06 11:30:00,"""I’ve been gaining weight unexpectedly and feel exhausted even after sleeping 8 hours.""","Diabetes, Type 2",,,,,,
+2025-05-06 14:45:00,"""I cry daily, can’t concentrate at work, and feel like a burden to others.""",Depression,,,,,,
+2025-05-06 16:20:00,"""My vision gets blurry during headaches, and my nose bleeds occasionally.""",High Blood Pressure,,,,,,
+2025-05-06 18:00:00,"""I interrupt people mid-conversation and can’t sit still during meetings.""",ADHD,,,,,,
+2025-05-10 09:00:00,"""Blackheads and whiteheads keep appearing on my nose and cheeks.""",Acne,,,,,,
+2025-05-10 12:00:00,"""I wake up at night to urinate and have constant dry mouth.""","Diabetes, Type 2",,,,,,
+2025-05-10 15:00:00,"""I feel numb, empty, and can’t remember the last time I was happy.""",Depression,,,,,,
+2025-05-10 17:30:00,"""My doctor said my BP is 150/95, but I don’t feel any symptoms.""",High Blood Pressure,,,,,,
+2025-05-10 19:00:00,"""I start projects but never finish them due to distractions.""",ADHD,,,,,,
+2025-05-15 08:00:00,"""My face is oily, and I have scars from old pimples.""",Acne,,,,,,
+2025-05-15 10:00:00,"""I crave sweets constantly and feel dizzy if I skip meals.""","Diabetes, Type 2",,,,,,
+2025-05-15 13:00:00,"""I avoid social gatherings because I feel worthless.""",Depression,,,,,,
+2025-05-15 16:00:00,"""I get shortness of breath after climbing one flight of stairs.""",High Blood Pressure,,,,,,
+2025-05-15 20:00:00,"""I lose my keys/wallet almost every day and procrastinate endlessly.""",ADHD,,,,,,
+2025-05-20 07:00:00,"""My acne flares up before my period and leaves dark spots.""",Acne,,,,,,
+2025-05-20 09:30:00,"""My wounds take weeks to heal, and I’m always hungry.""","Diabetes, Type 2",,,,,,
+2025-05-20 12:00:00,"""I oversleep but still feel exhausted and disconnected.""",Depression,,,,,,
+2025-05-20 14:00:00,"""I hear ringing in my ears and feel pressure in my chest.""",High Blood Pressure,,,,,,
+2025-05-20 18:00:00,"""I hyperfocus on hobbies but can’t follow routine tasks.""",ADHD,,,,,,

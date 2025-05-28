@@ -60,19 +60,24 @@ def login_validation():
         err = "Priyanshu caught you"
         return render_template('login.html', lbl=err)
 
+
 @app.route('/predict', methods=["GET", "POST"])
 def predict():
     if request.method == "POST":
+        # Get all form fields
+        name = request.form.get('name', '')
+        age = request.form.get('age', '')
+        gender = request.form.get('gender', '')
+        height = request.form.get('height', '')
+        weight = request.form.get('weight', '')
+        location = request.form.get('location', '')
         raw_text = request.form.get('rawtext', '')
 
         if raw_text.strip() == "":
             return render_template('predict.html', rawtext="No input provided", result="None", top_drugs=[])
 
         clean_text = cleanText(raw_text)
-        clean_lst = [clean_text]
-
-        # Vectorize and predict
-        tfidf_vect = vectorizer.transform(clean_lst)
+        tfidf_vect = vectorizer.transform([clean_text])
         prediction = model.predict(tfidf_vect)
         predicted_cond = prediction[0]
 
@@ -80,12 +85,16 @@ def predict():
         df = pd.read_csv(DATA_PATH)
         top_drugs = top_drugs_extractor(predicted_cond, df)
 
-        # Save tested input to CSV
-        save_tested_case(raw_text, predicted_cond)
+        # Save all fields + prediction to CSV log
+        save_tested_case(name, age, gender, height, weight, location, raw_text, predicted_cond)
 
-        return render_template('predict.html', rawtext=raw_text, result=predicted_cond, top_drugs=top_drugs)
-
+        return render_template('predict.html', 
+                               name=name, age=age, gender=gender, height=height,
+                               weight=weight, location=location, rawtext=raw_text, 
+                               result=predicted_cond, top_drugs=top_drugs)
     return redirect('/index')
+
+
 
 
 @app.route('/view_tests')
@@ -147,8 +156,6 @@ def homepage():
     return render_template('home.html')
 
 
-# === Helpers ===
-
 def cleanText(raw_review):
     review_text = BeautifulSoup(raw_review, 'html.parser').get_text()
     letters_only = re.sub('[^a-zA-Z]', ' ', review_text)
@@ -162,14 +169,20 @@ def top_drugs_extractor(condition, df):
     drug_lst = df_top[df_top['condition'] == condition]['drugName'].head(5).tolist()
     return drug_lst
 
-def save_tested_case(sentence, condition):
+# Updated save_tested_case to accept all form inputs and save to CSV
+def save_tested_case(name, age, gender, height, weight, location, rawtext, condition):
     log_entry = pd.DataFrame([{
         'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'input': sentence,
+        'name': name,
+        'age': age,
+        'gender': gender,
+        'height': height,
+        'weight': weight,
+        'location': location,
+        'input': rawtext,
         'predicted_condition': condition
     }])
     
-    # Check if file exists and append or create a new file
     if os.path.exists(LOG_PATH):
         existing = pd.read_csv(LOG_PATH)
         combined = pd.concat([existing, log_entry], ignore_index=True)
@@ -178,7 +191,7 @@ def save_tested_case(sentence, condition):
     
     try:
         combined.to_csv(LOG_PATH, index=False)
-        print(f"Successfully saved to {LOG_PATH}")
+        print(f"Saved tested case to {LOG_PATH}")
     except Exception as e:
         print(f"Error saving to CSV: {e}")
 
