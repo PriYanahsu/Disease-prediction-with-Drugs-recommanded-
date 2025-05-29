@@ -19,7 +19,7 @@ app.secret_key = os.urandom(24)
 MODEL_PATH = 'model/passmodelAce.pkl'
 TOKENIZER_PATH = 'model/tfidfvectorizerAce.pkl'
 DATA_PATH = 'data/drugsComTrain_raw.csv'
-LOG_PATH = 'data/tested_cases.csv'  # <-- path to store tested inputs
+LOG_PATH = 'data/tested_cases.csv'  
 
 # === Load model and vectorizer ===
 model = joblib.load(MODEL_PATH)
@@ -195,7 +195,6 @@ def save_tested_case(name, age, gender, height, weight, location, rawtext, condi
     except Exception as e:
         print(f"Error saving to CSV: {e}")
 
-# === Run Server ===
 
 if __name__ == "__main__":
     app.run(debug=True, host="localhost", port=8080)
