@@ -28,3 +28,6 @@ timestamp,input,predicted_condition,name,age,gender,height,weight,location
 2025-05-20 18:00:00,"""I hyperfocus on hobbies but can’t follow routine tasks.""",ADHD,,,,,,
 2025-05-29 12:54:15,"heart broken, overweight, not able sleep, always districted by peoples ",ADHD,Subham Verma,21.0,Male,183.0,80.0,"Lucknow, Uttar Pradesh"
 2025-05-29 12:55:57,lately i have been having trouble sleeping at night. when i wake up in the morning i feel tired.,Depression,,,,,,
+2025-05-29 15:52:24,not able to concentrate and sleepless night having problem during concentration,ADHD,Subham Verma,21.0,Male,183.0,80.0,"Lucknow, Uttar Pradesh"
+2025-05-29 15:54:52,drinking water ,"Diabetes, Type 2",Priyanshu Kumar,56.0,Male,183.0,80.0,"Lucknow, Uttar Pradesh"
+2025-05-29 15:56:03,A person with diabetes is someone whose body has difficulty regulating blood glucose (sugar) levels due to either insufficient insulin production or the body's inability to effectively use insulin.,"Diabetes, Type 2",Priyanshu Kumar,56,Male,183,80,"Lucknow, Uttar Pradesh"
