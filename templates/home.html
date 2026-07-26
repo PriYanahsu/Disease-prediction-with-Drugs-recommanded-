@@ -1,31 +1,61 @@
 {% extends "base.html" %}
-{% set show_nav = true %}
-{% block title %}Predict · MediGuide{% endblock %}
+{% block title %}Run model · MediGuide{% endblock %}
 
 {% block body %}
 <main class="page">
   <div class="shell">
-    <div class="page-head">
-      <h1>How are you feeling?</h1>
-      <p>Fill in your basics, then describe symptoms in everyday words. We’ll predict a likely condition and suggest well-rated drugs.</p>
+    <div class="page-head ml-head">
+      <div class="badge-row">
+        <span class="pill pill-live"><span class="dot"></span> Model online</span>
+        <span class="pill mono">{{ model_meta.name }}</span>
+        <span class="pill mono">{{ model_meta.vectorizer }}</span>
+        <span class="pill mono">{{ model_meta.classes }} classes</span>
+      </div>
+      <h1>ML condition prediction</h1>
+      <p>This is a machine-learning inference workspace — not a doctor. Paste symptoms, run the trained classifier, and get a ranked condition prediction plus drug suggestions from the dataset.</p>
     </div>
 
-    <div class="steps">
-      <div class="step"><strong>Step 1</strong><span>Your details</span></div>
-      <div class="step"><strong>Step 2</strong><span>Describe symptoms</span></div>
-      <div class="step"><strong>Step 3</strong><span>Get results</span></div>
+    <div class="pipeline" aria-label="ML pipeline">
+      <div class="pipe-step">
+        <span class="pipe-code">01</span>
+        <strong>Input</strong>
+        <span>Patient + symptoms</span>
+      </div>
+      <div class="pipe-arrow" aria-hidden="true">→</div>
+      <div class="pipe-step">
+        <span class="pipe-code">02</span>
+        <strong>NLP</strong>
+        <span>Clean · lemma · TF-IDF</span>
+      </div>
+      <div class="pipe-arrow" aria-hidden="true">→</div>
+      <div class="pipe-step">
+        <span class="pipe-code">03</span>
+        <strong>Classify</strong>
+        <span>PassiveAggressive</span>
+      </div>
+      <div class="pipe-arrow" aria-hidden="true">→</div>
+      <div class="pipe-step">
+        <span class="pipe-code">04</span>
+        <strong>Recommend</strong>
+        <span>Top-rated drugs</span>
+      </div>
     </div>
 
     <section class="panel">
-      <form method="POST" action="{{ url_for('predict') }}">
+      <div class="panel-label">
+        <span>Inference input</span>
+        <span class="mono muted-sm">POST /predict</span>
+      </div>
+
+      <form method="POST" action="{{ url_for('predict') }}" id="predict-form">
         <div class="grid-2">
           <div class="field">
             <label for="name">Full name</label>
-            <input id="name" type="text" name="name" placeholder="e.g. Priyanshu Singh" required>
+            <input id="name" type="text" name="name" placeholder="e.g. Priyanshu Singh" autocomplete="name" required>
           </div>
           <div class="field">
             <label for="age">Age</label>
-            <input id="age" type="number" name="age" min="1" max="120" placeholder="e.g. 24" required>
+            <input id="age" type="number" name="age" min="1" max="120" inputmode="numeric" placeholder="e.g. 24" required>
           </div>
           <div class="field">
             <label for="gender">Gender</label>
@@ -38,30 +68,30 @@
           </div>
           <div class="field">
             <label for="location">Location</label>
-            <input id="location" type="text" name="location" placeholder="City / area" required>
+            <input id="location" type="text" name="location" placeholder="City / area" autocomplete="address-level2" required>
           </div>
           <div class="field">
             <label for="height">Height (cm)</label>
-            <input id="height" type="number" name="height" min="50" max="250" placeholder="e.g. 170" required>
+            <input id="height" type="number" name="height" min="50" max="250" inputmode="numeric" placeholder="e.g. 170" required>
           </div>
           <div class="field">
             <label for="weight">Weight (kg)</label>
-            <input id="weight" type="number" name="weight" min="10" max="300" placeholder="e.g. 65" required>
+            <input id="weight" type="number" name="weight" min="10" max="300" inputmode="numeric" placeholder="e.g. 65" required>
           </div>
           <div class="field full">
-            <label for="msg">Symptom description</label>
-            <p class="hint">Example: “I have fever, body ache, and a dry cough for 3 days.”</p>
-            <textarea id="msg" name="rawtext" placeholder="Describe what you’re experiencing…" required></textarea>
+            <label for="msg">Symptom text <span class="label-tag">model feature</span></label>
+            <p class="hint">This free-text is the only feature the classifier uses. Example: “fever, body ache, dry cough for 3 days.”</p>
+            <textarea id="msg" name="rawtext" rows="5" placeholder="Describe symptoms in plain English…" required></textarea>
           </div>
         </div>
-        <div class="actions">
-          <button class="btn btn-primary" type="submit">Predict condition</button>
-          <a class="btn btn-ghost" href="{{ url_for('view_tests') }}">View past tests</a>
+        <div class="actions sticky-actions">
+          <button class="btn btn-primary" type="submit" id="predict-submit">Run ML prediction</button>
+          <a class="btn btn-ghost" href="{{ url_for('view_tests') }}">Past runs</a>
         </div>
       </form>
     </section>
 
-    <p class="footer-note">Not a substitute for professional medical advice.</p>
+    <p class="footer-note">Educational ML demo · model output ≠ medical diagnosis</p>
   </div>
 </main>
 {% endblock %}

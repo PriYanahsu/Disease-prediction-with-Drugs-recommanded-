@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% set show_nav = true %}
 {% block title %}History · MediGuide{% endblock %}
 
 {% block body %}
@@ -26,22 +25,40 @@
           <tbody>
             {% for case in tested_cases|reverse %}
             <tr>
-              <td>{{ case.timestamp or "—" }}</td>
+              <td class="nowrap">{{ case.timestamp or "—" }}</td>
               <td>
                 <strong>{{ case.name or "—" }}</strong><br>
-                <span style="color:var(--muted);font-size:.85rem;">{{ case.gender or "" }}{% if case.age %} · {{ case.age }} yrs{% endif %}</span>
+                <span class="cell-sub">{{ case.gender or "" }}{% if case.age %} · {{ case.age }} yrs{% endif %}</span>
               </td>
-              <td style="color:var(--muted);font-size:.88rem;">
+              <td class="cell-sub">
                 {% if case.height %}{{ case.height }} cm{% endif %}
                 {% if case.weight %} · {{ case.weight }} kg{% endif %}<br>
                 {{ case.location or "" }}
               </td>
-              <td style="max-width:280px;">{{ case.input or "—" }}</td>
-              <td><strong style="color:var(--brand);">{{ case.predicted_condition or "—" }}</strong></td>
+              <td class="clamp">{{ case.input or "—" }}</td>
+              <td><strong class="cond">{{ case.predicted_condition or "—" }}</strong></td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
+      </div>
+
+      <div class="history-cards" aria-hidden="false">
+        {% for case in tested_cases|reverse %}
+        <article class="history-card">
+          <div class="history-card-top">
+            <strong class="cond">{{ case.predicted_condition or "—" }}</strong>
+            <span class="cell-sub">{{ case.timestamp or "" }}</span>
+          </div>
+          <p class="clamp">{{ case.input or "—" }}</p>
+          <div class="meta-row">
+            {% if case.name %}<span class="chip">{{ case.name }}</span>{% endif %}
+            {% if case.age %}<span class="chip">{{ case.age }} yrs</span>{% endif %}
+            {% if case.gender %}<span class="chip">{{ case.gender }}</span>{% endif %}
+            {% if case.location %}<span class="chip">{{ case.location }}</span>{% endif %}
+          </div>
+        </article>
+        {% endfor %}
       </div>
       {% else %}
       <div class="empty">

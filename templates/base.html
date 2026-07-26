@@ -6,7 +6,7 @@
   <title>{% block title %}MediGuide{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
   {% block head %}{% endblock %}
 </head>
@@ -16,11 +16,17 @@
     <div class="shell topbar-inner">
       <a class="brand" href="{{ url_for('index') }}">
         <div class="brand-mark">M</div>
-        <span>MediGuide</span>
+        <div class="brand-text">
+          <span>MediGuide</span>
+          <small>ML inference</small>
+        </div>
       </a>
-      <nav class="nav-links">
-        <a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">Predict</a>
-        <a href="{{ url_for('view_tests') }}" class="{% if request.endpoint == 'view_tests' %}active{% endif %}">History</a>
+      <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="nav-links" id="nav-links">
+        <a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">Run model</a>
+        <a href="{{ url_for('view_tests') }}" class="{% if request.endpoint == 'view_tests' %}active{% endif %}">Runs</a>
         <a href="{{ url_for('analytics') }}" class="{% if request.endpoint == 'analytics' %}active{% endif %}">Analytics</a>
         <a href="{{ url_for('logout') }}" class="danger">Logout</a>
       </nav>
@@ -29,5 +35,20 @@
   {% endif %}
 
   {% block body %}{% endblock %}
+
+  <div id="predict-overlay" class="predict-overlay" hidden aria-hidden="true">
+    <div class="predict-overlay-card">
+      <div class="spinner" aria-hidden="true"></div>
+      <h2>Running inference…</h2>
+      <ol class="overlay-pipeline">
+        <li class="on">Clean + lemmatize text</li>
+        <li class="on">TF-IDF vectorize</li>
+        <li class="on">PassiveAggressive classify</li>
+        <li>Rank drugs by rating</li>
+      </ol>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
 </body>
 </html>

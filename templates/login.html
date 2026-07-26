@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% set show_nav = false %}
 {% block title %}Sign in · MediGuide{% endblock %}
 
 {% block body %}
@@ -7,21 +6,26 @@
   <div class="auth-shell">
     <section class="auth-hero">
       <div>
-        <div class="eyebrow">Disease prediction + drug guidance</div>
+        <div class="eyebrow">ML product · symptom classifier</div>
         <h1>MediGuide</h1>
-        <p>Describe how you feel in plain language. Get a predicted condition and top-rated drug suggestions — fast and clear.</p>
+        <p>An inference UI for a trained text classifier. Feed symptom language, get a ranked condition prediction and dataset-backed drug suggestions.</p>
         <ul class="hero-points">
-          <li>Symptom text → ML condition prediction</li>
-          <li>Top 5 highly-rated drug recommendations</li>
-          <li>History + analytics for your test cases</li>
+          <li>TF-IDF + PassiveAggressive multi-class model</li>
+          <li>Confidence + alternate class ranking</li>
+          <li>Top-rated drug retrieval by predicted label</li>
         </ul>
+        <div class="hero-tech mono">
+          <span>vectorizer: TF-IDF</span>
+          <span>model: PassiveAggressive</span>
+          <span>task: text → condition</span>
+        </div>
       </div>
-      <p style="margin:0;opacity:.75;font-size:.85rem;">Educational demo — not a medical diagnosis.</p>
+      <p class="auth-disclaimer">Educational ML demo — not a medical diagnosis.</p>
     </section>
 
     <section class="auth-form-wrap">
-      <h2>Welcome back</h2>
-      <p class="sub">Sign in to continue to your prediction workspace.</p>
+      <h2>Sign in</h2>
+      <p class="sub">Enter the workspace to run predictions.</p>
 
       {% if error %}
       <div class="alert alert-error">{{ error }}</div>
@@ -36,7 +40,7 @@
           <label for="password">Password</label>
           <input id="password" type="password" name="password" placeholder="Enter password" required>
         </div>
-        <button class="btn btn-primary" type="submit">Sign in</button>
+        <button class="btn btn-primary" type="submit">Open inference workspace</button>
       </form>
 
       <div class="demo-note">

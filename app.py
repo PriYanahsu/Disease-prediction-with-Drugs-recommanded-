@@ -1,13 +1,14 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 import os
+import csv
 import joblib
+import numpy as np
 import pandas as pd
 import re
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
-from bs4 import BeautifulSoup
 from datetime import datetime
-from collections import Counter
+from collections import Counter, defaultdict
 from functools import wraps
 from dotenv import load_dotenv
 
@@ -23,13 +24,61 @@ MODEL_PATH = "model/passmodelAce.pkl"
 TOKENIZER_PATH = "model/tfidfvectorizerAce.pkl"
 DATA_PATH = "data/drugsComTrain_raw.csv"
 LOG_PATH = "data/tested_cases.csv"
+DRUG_CACHE_PATH = "data/top_drugs_cache.csv"
 
 model = joblib.load(MODEL_PATH)
 vectorizer = joblib.load(TOKENIZER_PATH)
-df_drugs = pd.read_csv(DATA_PATH)
 
-stop = stopwords.words("english")
+# frozenset = O(1) membership; WordNetLemmatizer is reused across requests
+STOP_WORDS = frozenset(stopwords.words("english"))
 lemmatizer = WordNetLemmatizer()
+_TAG_RE = re.compile(r"<[^>]+>")
+_NON_ALPHA_RE = re.compile(r"[^a-zA-Z]+")
+
+# Warm WordNet + sklearn so the first real request is not a 2s cold start
+_ = lemmatizer.lemmatize("symptoms")
+_ = model.predict(vectorizer.transform(["fever cough headache"]))
+
+MODEL_META = {
+    "name": "PassiveAggressiveClassifier",
+    "vectorizer": "TF-IDF",
+    "classes": int(len(getattr(model, "classes_", []))),
+    "task": "Multi-class symptom -> condition",
+}
+
+
+def build_top_drugs_map(csv_path: str) -> dict:
+    """Precompute condition -> top-5 drugs once (avoids scanning 79MB CSV per request)."""
+    if os.path.exists(DRUG_CACHE_PATH):
+        cache = pd.read_csv(DRUG_CACHE_PATH)
+        mapping = defaultdict(list)
+        for _, row in cache.iterrows():
+            mapping[str(row["condition"])].append(str(row["drugName"]))
+        return dict(mapping)
+
+    df = pd.read_csv(
+        csv_path,
+        usecols=["drugName", "condition", "rating", "usefulCount"],
+        low_memory=False,
+    )
+    df = df.dropna(subset=["condition", "drugName"])
+    df = df[(df["rating"] >= 9) & (df["usefulCount"] >= 100)]
+    df = df.sort_values(["condition", "rating", "usefulCount"], ascending=[True, False, False])
+
+    rows = []
+    mapping = {}
+    for condition, group in df.groupby("condition", sort=False):
+        # unique drug names preserving rating order
+        drugs = list(dict.fromkeys(group["drugName"].tolist()))[:5]
+        mapping[str(condition)] = drugs
+        for drug in drugs:
+            rows.append({"condition": condition, "drugName": drug})
+
+    pd.DataFrame(rows).to_csv(DRUG_CACHE_PATH, index=False)
+    return mapping
+
+
+TOP_DRUGS_BY_CONDITION = build_top_drugs_map(DATA_PATH)
 
 
 def login_required(view):
@@ -42,11 +91,16 @@ def login_required(view):
     return wrapped
 
 
+@app.context_processor
+def inject_globals():
+    return {"show_nav": False, "model_meta": MODEL_META}
+
+
 @app.route("/")
 def login():
     if "user_id" in session:
         return redirect(url_for("index"))
-    return render_template("login.html")
+    return render_template("login.html", show_nav=False)
 
 
 @app.route("/logout")
@@ -58,7 +112,7 @@ def logout():
 @app.route("/index")
 @login_required
 def index():
-    return render_template("home.html")
+    return render_template("home.html", show_nav=True)
 
 
 @app.route("/home")
@@ -78,6 +132,7 @@ def login_validation():
 
     return render_template(
         "login.html",
+        show_nav=False,
         error="Invalid email or password. Please try again.",
     )
 
@@ -88,17 +143,18 @@ def predict():
     if request.method != "POST":
         return redirect(url_for("index"))
 
-    name = request.form.get("name", "")
-    age = request.form.get("age", "")
-    gender = request.form.get("gender", "")
-    height = request.form.get("height", "")
-    weight = request.form.get("weight", "")
-    location = request.form.get("location", "")
-    raw_text = request.form.get("rawtext", "")
+    name = (request.form.get("name") or "").strip()
+    age = (request.form.get("age") or "").strip()
+    gender = (request.form.get("gender") or "").strip()
+    height = (request.form.get("height") or "").strip()
+    weight = (request.form.get("weight") or "").strip()
+    location = (request.form.get("location") or "").strip()
+    raw_text = (request.form.get("rawtext") or "").strip()
 
-    if not raw_text.strip():
+    if not raw_text:
         return render_template(
             "predict.html",
+            show_nav=True,
             name=name,
             age=age,
             gender=gender,
@@ -107,19 +163,23 @@ def predict():
             location=location,
             rawtext="",
             result=None,
+            confidence=None,
+            top_predictions=[],
             top_drugs=[],
+            tokens=[],
             error="Please describe your symptoms before predicting.",
         )
 
-    clean_text = cleanText(raw_text)
+    clean_text = clean_text_fast(raw_text)
+    tokens = [t for t in clean_text.split() if t][:18]
     tfidf_vect = vectorizer.transform([clean_text])
-    prediction = model.predict(tfidf_vect)
-    predicted_cond = prediction[0]
-    top_drugs = top_drugs_extractor(predicted_cond, df_drugs)
+    predicted_cond, confidence, top_predictions = rank_predictions(tfidf_vect, top_k=3)
+    top_drugs = TOP_DRUGS_BY_CONDITION.get(str(predicted_cond), [])
     save_tested_case(name, age, gender, height, weight, location, raw_text, predicted_cond)
 
     return render_template(
         "predict.html",
+        show_nav=True,
         name=name,
         age=age,
         gender=gender,
@@ -128,7 +188,10 @@ def predict():
         location=location,
         rawtext=raw_text,
         result=predicted_cond,
+        confidence=confidence,
+        top_predictions=top_predictions,
         top_drugs=top_drugs,
+        tokens=tokens,
         error=None,
     )
 
@@ -136,50 +199,48 @@ def predict():
 @app.route("/view_tests")
 @login_required
 def view_tests():
-    if not os.path.exists(LOG_PATH):
-        tested_cases = []
-    else:
-        df_log = pd.read_csv(LOG_PATH)
-        tested_cases = df_log.fillna("").to_dict(orient="records")
-    return render_template("view_tests.html", tested_cases=tested_cases)
+    tested_cases = load_tested_cases()
+    return render_template("view_tests.html", show_nav=True, tested_cases=tested_cases)
 
 
 @app.route("/analytics")
 @login_required
 def analytics():
     try:
-        if os.path.exists(LOG_PATH):
-            df = pd.read_csv(LOG_PATH)
-        else:
-            df = pd.DataFrame()
+        tested_cases = load_tested_cases()
+        if not tested_cases:
+            return render_template(
+                "analytics.html",
+                show_nav=True,
+                condition_counts={},
+                drug_counts={},
+                daily_counts={},
+                total_predictions=0,
+            )
 
-        condition_counts = (
-            dict(Counter(df["predicted_condition"].dropna().tolist())) if not df.empty else {}
-        )
+        conditions = [c.get("predicted_condition") for c in tested_cases if c.get("predicted_condition")]
+        condition_counts = dict(Counter(conditions))
 
-        drugs = []
-        if "top_drugs" in df.columns and not df.empty:
-            for drug_list in df["top_drugs"]:
-                drugs.extend([d.strip() for d in str(drug_list).split(",") if d.strip()])
-        drug_counts = dict(Counter(drugs)) if drugs else {}
-
-        timestamps = pd.to_datetime(df["timestamp"], errors="coerce") if not df.empty else pd.Series(dtype="datetime64[ns]")
-        daily_counts = timestamps.dt.date.value_counts().sort_index() if not df.empty else {}
-        daily_counts_dict = {str(key): int(value) for key, value in daily_counts.items()}
-
-        total_predictions = int(sum(condition_counts.values())) if condition_counts else 0
+        timestamps = []
+        for case in tested_cases:
+            ts = case.get("timestamp")
+            if ts:
+                timestamps.append(str(ts)[:10])
+        daily_counts = dict(sorted(Counter(timestamps).items()))
 
         return render_template(
             "analytics.html",
+            show_nav=True,
             condition_counts=condition_counts,
-            drug_counts=drug_counts,
-            daily_counts=daily_counts_dict,
-            total_predictions=total_predictions,
+            drug_counts={},
+            daily_counts=daily_counts,
+            total_predictions=len(conditions),
         )
     except Exception as e:
         print(f"Error processing analytics: {e}")
         return render_template(
             "analytics.html",
+            show_nav=True,
             condition_counts={},
             drug_counts={},
             daily_counts={},
@@ -187,49 +248,81 @@ def analytics():
         )
 
 
-def cleanText(raw_review):
-    review_text = BeautifulSoup(raw_review, "html.parser").get_text()
-    letters_only = re.sub("[^a-zA-Z]", " ", review_text)
-    words = letters_only.lower().split()
-    meaningful_words = [w for w in words if w not in stop]
-    lemmatized_words = [lemmatizer.lemmatize(w) for w in meaningful_words]
-    return " ".join(lemmatized_words)
+def clean_text_fast(raw_review: str) -> str:
+    """Lightweight cleaner — no BeautifulSoup round-trip on plain symptom text."""
+    text = _TAG_RE.sub(" ", raw_review)
+    text = _NON_ALPHA_RE.sub(" ", text).lower()
+    words = [w for w in text.split() if w not in STOP_WORDS and len(w) > 1]
+    return " ".join(lemmatizer.lemmatize(w) for w in words)
 
 
-def top_drugs_extractor(condition, df):
-    df_top = df[(df["rating"] >= 9) & (df["usefulCount"] >= 100)].sort_values(
-        by=["rating", "usefulCount"], ascending=[False, False]
-    )
-    return df_top[df_top["condition"] == condition]["drugName"].head(5).tolist()
+def rank_predictions(tfidf_vect, top_k=3):
+    """Softmax over decision scores → confidence + alternate class rankings."""
+    scores = np.asarray(model.decision_function(tfidf_vect)).reshape(-1)
+    classes = np.asarray(model.classes_)
+    # numerically stable softmax
+    shifted = scores - scores.max()
+    probs = np.exp(shifted)
+    probs = probs / probs.sum()
+
+    order = np.argsort(probs)[::-1][:top_k]
+    ranked = [
+        {
+            "label": str(classes[i]),
+            "confidence": round(float(probs[i]) * 100, 1),
+            "score": round(float(scores[i]), 3),
+        }
+        for i in order
+    ]
+    return ranked[0]["label"], ranked[0]["confidence"], ranked
 
 
 def save_tested_case(name, age, gender, height, weight, location, rawtext, condition):
-    log_entry = pd.DataFrame(
-        [
-            {
-                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "name": name,
-                "age": age,
-                "gender": gender,
-                "height": height,
-                "weight": weight,
-                "location": location,
-                "input": rawtext,
-                "predicted_condition": condition,
-            }
-        ]
-    )
+    """Append a single row — do not rewrite the whole CSV every prediction."""
+    fieldnames = [
+        "timestamp",
+        "name",
+        "age",
+        "gender",
+        "height",
+        "weight",
+        "location",
+        "input",
+        "predicted_condition",
+    ]
+    row = {
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "name": name,
+        "age": age,
+        "gender": gender,
+        "height": height,
+        "weight": weight,
+        "location": location,
+        "input": rawtext,
+        "predicted_condition": condition,
+    }
 
-    if os.path.exists(LOG_PATH):
-        existing = pd.read_csv(LOG_PATH)
-        combined = pd.concat([existing, log_entry], ignore_index=True)
-    else:
-        combined = log_entry
-
+    os.makedirs(os.path.dirname(LOG_PATH) or ".", exist_ok=True)
+    write_header = not os.path.exists(LOG_PATH) or os.path.getsize(LOG_PATH) == 0
     try:
-        combined.to_csv(LOG_PATH, index=False)
+        with open(LOG_PATH, "a", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            if write_header:
+                writer.writeheader()
+            writer.writerow(row)
     except Exception as e:
         print(f"Error saving to CSV: {e}")
+
+
+def load_tested_cases():
+    if not os.path.exists(LOG_PATH) or os.path.getsize(LOG_PATH) == 0:
+        return []
+    try:
+        with open(LOG_PATH, newline="", encoding="utf-8") as f:
+            return list(csv.DictReader(f))
+    except Exception as e:
+        print(f"Error reading log: {e}")
+        return []
 
 
 if __name__ == "__main__":
