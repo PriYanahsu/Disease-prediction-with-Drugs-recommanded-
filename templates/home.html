@@ -1,207 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
+{% set show_nav = true %}
+{% block title %}Predict · MediGuide{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Condition-Based Drug Prediction</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Arial', sans-serif;
-            background: url('/static/LoginIMG.jpg') no-repeat center center fixed;
-            background-size: cover;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            color: #333;
-        }
-
-        .navbar {
-            background: rgba(51, 51, 51, 0.8);
-            color: white;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .navbar-brand {
-            font-size: 28px;
-            font-weight: bold;
-            color: white;
-        }
-
-        .form-container {
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.1);
-            margin-top: 50px;
-            flex: 1;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .form-container h4 {
-            font-size: 28px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 30px;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 14px;
-            font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: #43a047;
-            box-shadow: 0 0 8px rgba(67, 160, 71, 0.6);
-        }
-
-        textarea.input-field {
-            resize: vertical;
-        }
-
-        #submit {
-            width: 100%;
-            padding: 14px;
-            background-color: #FF5733;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-top: 20px;
-        }
-
-        #submit:hover {
-            background-color: #e64a19;
-        }
-
-        .footer {
-            background: #333333;
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
-            width: 100%;
-            bottom: 0;
-            position: relative;
-        }
-
-        .footer ul {
-            list-style-type: none;
-            padding: 0;
-            margin-bottom: 20px;
-        }
-
-        .footer ul li {
-            display: inline;
-            margin-right: 20px;
-        }
-
-        .footer ul li a {
-            color: white;
-            text-decoration: none;
-            font-size: 18px;
-            transition: color 0.3s ease;
-        }
-
-        .footer ul li a:hover {
-            color: #FFD700;
-        }
-
-        .footer p {
-            font-size: 16px;
-            margin-top: 20px;
-            opacity: 0.8;
-        }
-
-        .container {
-            max-width: 90%;
-            padding: 20px;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 4px 30px;
-            margin: 10px;
-            background-color: #4CAF50;
-            /* Green */
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn:hover {
-            background-color: #45a049;
-        }
-    </style>
-</head>
-
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Disease Detection with Drugs Recommendation</a>
-        </div>
-        <a href="/view_tests" class="btn">Past Tested Data</a>
-    </nav>
-
-    <div class="container">
-        <div class="form-container text-center">
-            <h4>Enter Your Details for Drug Recommendations Based on Your Health</h4>
-            <form method="POST" action='/predict'>
-                <input type="text" id="name" name="name" class="input-field" placeholder="Enter your name..." required>
-                <br>
-                <input type="number" id="age" name="age" class="input-field" placeholder="Enter your age..." required>
-                <br>
-                <select id="gender" name="gender" class="input-field" required>
-                    <option value="" disabled selected>Select Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                </select>
-                <br>
-                <input type="number" id="height" name="height" class="input-field" placeholder="Height in cm..."
-                    required>
-                <br>
-                <input type="number" id="weight" name="weight" class="input-field" placeholder="Weight in kg..."
-                    required>
-                <br>
-                <input type="text" id="location" name="location" class="input-field"
-                    placeholder="Enter your location..." required>
-                <br>
-                <textarea id="msg" name="rawtext" class="input-field"
-                    placeholder="Describe problems during any activity..." required rows="4"></textarea>
-                <br>
-                <input type="submit" id="submit" value="Predict">
-            </form>
-        </div>
+{% block body %}
+<main class="page">
+  <div class="shell">
+    <div class="page-head">
+      <h1>How are you feeling?</h1>
+      <p>Fill in your basics, then describe symptoms in everyday words. We’ll predict a likely condition and suggest well-rated drugs.</p>
     </div>
 
-    <div class="footer">
-        <ul class="nav justify-content-center">
-            <li class="nav-item"><a href="/home.html" class="nav-link">Home</a></li>
-            <li class="nav-item"><a href="#" class="nav-link">Features</a></li>
-            <li class="nav-item"><a href="#" class="nav-link">Pricing</a></li>
-            <li class="nav-item"><a href="#" class="nav-link">FAQs</a></li>
-            <li class="nav-item"><a href="#" class="nav-link">About</a></li>
-        </ul>
-        <p>©Priyanshu</p>
+    <div class="steps">
+      <div class="step"><strong>Step 1</strong><span>Your details</span></div>
+      <div class="step"><strong>Step 2</strong><span>Describe symptoms</span></div>
+      <div class="step"><strong>Step 3</strong><span>Get results</span></div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+    <section class="panel">
+      <form method="POST" action="{{ url_for('predict') }}">
+        <div class="grid-2">
+          <div class="field">
+            <label for="name">Full name</label>
+            <input id="name" type="text" name="name" placeholder="e.g. Priyanshu Singh" required>
+          </div>
+          <div class="field">
+            <label for="age">Age</label>
+            <input id="age" type="number" name="age" min="1" max="120" placeholder="e.g. 24" required>
+          </div>
+          <div class="field">
+            <label for="gender">Gender</label>
+            <select id="gender" name="gender" required>
+              <option value="" disabled selected>Select gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="location">Location</label>
+            <input id="location" type="text" name="location" placeholder="City / area" required>
+          </div>
+          <div class="field">
+            <label for="height">Height (cm)</label>
+            <input id="height" type="number" name="height" min="50" max="250" placeholder="e.g. 170" required>
+          </div>
+          <div class="field">
+            <label for="weight">Weight (kg)</label>
+            <input id="weight" type="number" name="weight" min="10" max="300" placeholder="e.g. 65" required>
+          </div>
+          <div class="field full">
+            <label for="msg">Symptom description</label>
+            <p class="hint">Example: “I have fever, body ache, and a dry cough for 3 days.”</p>
+            <textarea id="msg" name="rawtext" placeholder="Describe what you’re experiencing…" required></textarea>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" type="submit">Predict condition</button>
+          <a class="btn btn-ghost" href="{{ url_for('view_tests') }}">View past tests</a>
+        </div>
+      </form>
+    </section>
 
-</html>
+    <p class="footer-note">Not a substitute for professional medical advice.</p>
+  </div>
+</main>
+{% endblock %}

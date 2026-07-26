@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}MediGuide{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  {% if show_nav %}
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <a class="brand" href="{{ url_for('index') }}">
+        <div class="brand-mark">M</div>
+        <span>MediGuide</span>
+      </a>
+      <nav class="nav-links">
+        <a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">Predict</a>
+        <a href="{{ url_for('view_tests') }}" class="{% if request.endpoint == 'view_tests' %}active{% endif %}">History</a>
+        <a href="{{ url_for('analytics') }}" class="{% if request.endpoint == 'analytics' %}active{% endif %}">Analytics</a>
+        <a href="{{ url_for('logout') }}" class="danger">Logout</a>
+      </nav>
+    </div>
+  </header>
+  {% endif %}
+
+  {% block body %}{% endblock %}
+</body>
+</html>

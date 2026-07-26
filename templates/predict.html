@@ -1,219 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
+{% set show_nav = true %}
+{% block title %}Results · MediGuide{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Predict Page</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Arial', sans-serif;
-            background: url('/static/LoginIMG.jpg') no-repeat center center fixed;
-            background-size: cover;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        .navbar {
-            background: rgba(51, 51, 51, 0.9);
-        }
-
-        .navbar-brand {
-            font-size: 24px;
-            color: white;
-            font-weight: bold;
-        }
-
-        .container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .form-container {
-            padding: 40px 20px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 600px;
-            text-align: center;
-        }
-
-        .form-container h4 {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        .input-field {
-            width: 90%;
-            padding: 12px;
-            font-size: 18px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-
-        #submit {
-            width: 150px;
-            padding: 12px;
-            background-color: #FF5733;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        #submit:hover {
-            background-color: #c0392b;
-        }
-
-        .card {
-            margin-top: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .drug-recommendations {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .drug-recommendations p {
-            background-color: #43a047;
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 16px;
-            text-align: center;
-        }
-
-        .footer {
-            background-color: #333333;
-            color: white;
-            padding: 30px;
-            text-align: center;
-            width: 100%;
-        }
-
-        .footer ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .footer ul li {
-            display: inline;
-            margin-right: 20px;
-        }
-
-        .footer ul li a {
-            color: white;
-            text-decoration: none;
-            font-size: 16px;
-        }
-
-        .footer ul li a:hover {
-            color: #FFD700;
-        }
-
-        .footer p {
-            font-size: 14px;
-            margin-top: 20px;
-        }
-         .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            margin: 15px;
-            background-color: #4CAF50;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn:hover {
-            background-color: #45a049;
-        }
-    </style>
-</head>
-
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Disease Detection with Drugs Recommendation</a>
-        </div>
-            <a href="/view_tests" class="btn">Past Tested Data</a>
-    </nav>
-
-    <div class="container">
-        <div class="form-container">
-            <h4>Describe problems during any activity for further prediction...</h4>
-            <form method="POST" action='/predict'>
-                <input type="text" id="msg" name="rawtext" class="input-field" placeholder="Enter medical condition..." required>
-                <br>
-                <input type="submit" id="submit" value="Predict">
-            </form>
-        </div>
-
-        <div class="card text-center">
-            <div class="card-header">
-                <strong>Original Entered Review:</strong>
-            </div>
-            <div class="card-body">
-                <p id="new">{{ rawtext }}</p>
-            </div>
-        </div>
-
-        <div class="card text-center">
-            <div class="card-header">
-                <strong>Predicted Medical Condition:</strong>
-            </div>
-            <div class="card-body">
-                <p id="new">{{ result }}</p>
-            </div>
-        </div>
-
-        <div class="card text-center">
-            <div class="card-header">
-                <strong>Top 5 Recommended Drugs:</strong>
-            </div>
-            <div class="card-body">
-                <div class="drug-recommendations">
-                    {% for top_drug in top_drugs %}
-                        <p>{{ top_drug }}</p>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
+{% block body %}
+<main class="page">
+  <div class="shell">
+    <div class="page-head">
+      <h1>Your results</h1>
+      <p>Here’s what the model predicted from your symptom description, plus top drug suggestions for that condition.</p>
     </div>
 
-    <div class="footer">
-        <ul class="nav justify-content-center">
-            <li class="nav-item"><a href="/home.html" class="nav-link">Home</a></li>
-            <li class="nav-item"><a href="#" class="nav-link">Features</a></li>
-            <li class="nav-item"><a href="#" class="nav-link">Pricing</a></li>
-            <li class="nav-item"><a href="#" class="nav-link">FAQs</a></li>
-            <li class="nav-item"><a href="#" class="nav-link">About</a></li>
-        </ul>
-        <p>&copy;PriyanshSingh</p>
-    </div>
+    {% if error %}
+    <div class="alert alert-error">{{ error }}</div>
+    {% endif %}
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+    <section class="panel">
+      {% if result %}
+      <div class="alert alert-ok">Prediction complete. Review the condition and recommended drugs below.</div>
+      {% endif %}
 
-</html>
+      <div class="result-grid">
+        <div class="result-card">
+          <h3>Predicted condition</h3>
+          <p class="value">{{ result or "—" }}</p>
+          {% if name or age or gender %}
+          <div class="meta-row">
+            {% if name %}<span class="chip">{{ name }}</span>{% endif %}
+            {% if age %}<span class="chip">Age {{ age }}</span>{% endif %}
+            {% if gender %}<span class="chip">{{ gender }}</span>{% endif %}
+            {% if location %}<span class="chip">{{ location }}</span>{% endif %}
+            {% if height %}<span class="chip">{{ height }} cm</span>{% endif %}
+            {% if weight %}<span class="chip">{{ weight }} kg</span>{% endif %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="result-card">
+          <h3>What you entered</h3>
+          <p style="margin:0;line-height:1.55;color:var(--muted);">{{ rawtext or "No symptoms provided." }}</p>
+        </div>
+
+        <div class="result-card">
+          <h3>Top recommended drugs</h3>
+          {% if top_drugs and top_drugs|length > 0 %}
+          <ul class="drug-list">
+            {% for drug in top_drugs %}
+            <li>{{ drug }}</li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p style="margin:0;color:var(--muted);">No high-rated drug matches found for this condition in the dataset.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="actions" style="margin-top:1.25rem;">
+        <a class="btn btn-primary" href="{{ url_for('index') }}">New prediction</a>
+        <a class="btn btn-ghost" href="{{ url_for('view_tests') }}">History</a>
+        <a class="btn btn-ghost" href="{{ url_for('analytics') }}">Analytics</a>
+      </div>
+    </section>
+
+    <p class="footer-note">Always consult a doctor before taking any medication.</p>
+  </div>
+</main>
+{% endblock %}

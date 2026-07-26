@@ -1,222 +1,101 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
+{% set show_nav = true %}
+{% block title %}Analytics · MediGuide{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f4f7fb;
-            color: #333;
-            padding: 40px;
-        }
-
-        h3 {
-            font-size: 24px;
-            margin-bottom: 20px;
-            color: #4b8e8d;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .chart-container {
-            margin: 30px 0;
-            width: 100%;
-            max-width: 1000px;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            background: #fff;
-        }
-
-        .card-container {
-            margin-top: 30px;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            background: #4b8e8d;
-            color: #fff;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-
-        header h2 {
-            font-size: 26px;
-            font-weight: 600;
-        }
-
-        .analytics-cards {
-            display: flex;
-            justify-content: space-around;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .card {
-            width: 30%;
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .card h4 {
-            font-size: 18px;
-            color: #333;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .card ul {
-            list-style-type: none;
-            padding-left: 0;
-        }
-
-        .card li {
-            margin-bottom: 6px;
-            font-size: 14px;
-        }
-
-        .card p {
-            font-size: 22px;
-            color: #4b8e8d;
-            font-weight: 700;
-        }
-
-        .button {
-            display: inline-block;
-            background-color: #4b8e8d;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: 600;
-            transition: background-color 0.3s ease;
-        }
-
-        .button:hover {
-            background-color: #3a746c;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .analytics-cards {
-                flex-direction: column;
-                gap: 20px;
-            }
-
-            .card {
-                width: 100%;
-            }
-        }
-    </style>
-</head>
-
-<body>
-    <header>
-        <h2>Analytics Dashboard</h2>
-        <a href="/home" class="button">Go to Homepage</a>
-    </header>
-
-    <div class="analytics-cards">
-        <div class="card">
-            <h4>Conditions Overview</h4>
-            <ul id="condition-count">
-                <!-- Conditions will be listed here -->
-            </ul>
-        </div>
-        <div class="card">
-            <h4>Daily Activity Overview</h4>
-            <ul id="daily-count">
-            </ul>
-        </div>
+{% block body %}
+<main class="page">
+  <div class="shell">
+    <div class="page-head">
+      <h1>Analytics</h1>
+      <p>Quick view of predicted conditions and daily activity from your saved tests.</p>
     </div>
 
-    <div class="chart-container">
-        <h3>Condition Counts</h3>
-        <canvas id="conditionChart"></canvas>
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="label">Unique conditions</div>
+        <div class="num">{{ condition_counts|length }}</div>
+      </div>
+      <div class="stat">
+        <div class="label">Active days</div>
+        <div class="num">{{ daily_counts|length }}</div>
+      </div>
+      <div class="stat">
+        <div class="label">Total predictions</div>
+        <div class="num">{{ total_predictions }}</div>
+      </div>
     </div>
 
-    <div class="chart-container">
-        <h3>Daily Activity</h3>
-        <canvas id="dailyChart"></canvas>
-    </div>
+    <section class="panel charts">
+      {% if condition_counts %}
+      <div class="chart-box">
+        <h3>Condition counts</h3>
+        <canvas id="conditionChart" height="120"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>Daily activity</h3>
+        <canvas id="dailyChart" height="120"></canvas>
+      </div>
+      {% else %}
+      <div class="empty">
+        <p>No analytics data yet. Predictions will show up here automatically.</p>
+        <a class="btn btn-primary" href="{{ url_for('index') }}">Make a prediction</a>
+      </div>
+      {% endif %}
 
-    <script>
-        const conditionCounts = {{ condition_counts | tojson }};
-        const dailyCounts = {{ daily_counts | tojson }};
+      <div class="actions">
+        <a class="btn btn-ghost" href="{{ url_for('index') }}">Back to predict</a>
+        <a class="btn btn-ghost" href="{{ url_for('view_tests') }}">View history</a>
+      </div>
+    </section>
+  </div>
+</main>
 
-        console.log('Condition Counts:', conditionCounts);
-        console.log('Daily Counts:', dailyCounts);
+{% if condition_counts %}
+<script>
+  const conditionCounts = {{ condition_counts | tojson }};
+  const dailyCounts = {{ daily_counts | tojson }};
+  const brand = "#0f6e6a";
 
-        document.getElementById('condition-count').innerHTML =
-            Object.entries(conditionCounts).map(([key, value]) =>
-                `<li><strong>${key}</strong>: ${value}</li>`
-            ).join('') || "<li>No condition data available</li>";
+  new Chart(document.getElementById("conditionChart"), {
+    type: "bar",
+    data: {
+      labels: Object.keys(conditionCounts),
+      datasets: [{
+        label: "Count",
+        data: Object.values(conditionCounts),
+        backgroundColor: brand,
+        borderRadius: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+    }
+  });
 
-        document.getElementById('daily-count').innerHTML =
-            Object.entries(dailyCounts).map(([key, value]) =>
-                `<li><strong>${key}</strong>: ${value}</li>`
-            ).join('') || "<li>No daily activity data available</li>";
-
-        new Chart(document.getElementById("conditionChart"), {
-            type: 'bar',
-            data: {
-                labels: Object.keys(conditionCounts),
-                datasets: [{
-                    label: 'Condition Count',
-                    data: Object.values(conditionCounts),
-                    backgroundColor: '#4b8e8d'
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            }
-        });
-
-
-        new Chart(document.getElementById("dailyChart"), {
-            type: 'line',
-            data: {
-                labels: Object.keys(dailyCounts),
-                datasets: [{
-                    label: 'Daily Count',
-                    data: Object.values(dailyCounts),
-                    fill: false,
-                    borderColor: '#6a4c93',
-                    tension: 0.3
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            }
-        });
-    </script>
-</body>
-
-</html>
+  new Chart(document.getElementById("dailyChart"), {
+    type: "line",
+    data: {
+      labels: Object.keys(dailyCounts),
+      datasets: [{
+        label: "Predictions",
+        data: Object.values(dailyCounts),
+        borderColor: brand,
+        backgroundColor: "rgba(15,110,106,0.15)",
+        fill: true,
+        tension: 0.35
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+    }
+  });
+</script>
+{% endif %}
+{% endblock %}

@@ -1,219 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
+{% set show_nav = false %}
+{% block title %}Sign in · MediGuide{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block body %}
+<main class="auth-page">
+  <div class="auth-shell">
+    <section class="auth-hero">
+      <div>
+        <div class="eyebrow">Disease prediction + drug guidance</div>
+        <h1>MediGuide</h1>
+        <p>Describe how you feel in plain language. Get a predicted condition and top-rated drug suggestions — fast and clear.</p>
+        <ul class="hero-points">
+          <li>Symptom text → ML condition prediction</li>
+          <li>Top 5 highly-rated drug recommendations</li>
+          <li>History + analytics for your test cases</li>
+        </ul>
+      </div>
+      <p style="margin:0;opacity:.75;font-size:.85rem;">Educational demo — not a medical diagnosis.</p>
+    </section>
 
-    <link rel="apple-touch-icon" type="image/png"
-        href="https://cpwebassets.codepen.io/assets/favicon/apple-touch-icon-5ae1a0698dcc2402e9712f7d01ed509a57814f994c660df9f7a952f3060705ee.png">
+    <section class="auth-form-wrap">
+      <h2>Welcome back</h2>
+      <p class="sub">Sign in to continue to your prediction workspace.</p>
 
-    <meta name="apple-mobile-web-app-title" content="Disease Detection Login">
+      {% if error %}
+      <div class="alert alert-error">{{ error }}</div>
+      {% endif %}
 
-    <link rel="shortcut icon" type="image/x-icon"
-        href="https://cpwebassets.codepen.io/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico">
+      <form method="POST" action="{{ url_for('login_validation') }}" autocomplete="on">
+        <div class="field">
+          <label for="username">Email</label>
+          <input id="username" type="email" name="username" placeholder="you@example.com" required autofocus>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" name="password" placeholder="Enter password" required>
+        </div>
+        <button class="btn btn-primary" type="submit">Sign in</button>
+      </form>
 
-    <link rel="mask-icon" type="image/x-icon"
-        href="https://cpwebassets.codepen.io/assets/favicon/logo-pin-b4b4269c16397ad2f0f7a01bcdf513a1994f4c94b8af2f191c09eb0d601762b1.svg"
-        color="#111">
-
-    <title>Disease Detection Login</title>
-
-    <style>
-        html,
-        body {
-            height: 100%;
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-        }
-
-        .bg {
-            position: absolute;
-            z-index: -1;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            background: url('/static/loginn1.jpg') no-repeat center center;
-            background-size: cover;
-        }
-
-        @keyframes gradientBG {
-            0% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .form-signin {
-            width: 100%;
-            max-width: 400px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(5px);
-            text-align: center;
-        }
-
-        .form-signin h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 2.2em;
-            font-weight: bold;
-        }
-
-        .form-signin .heading {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #4caf50;
-            margin-bottom: 20px;
-            animation: colorChange 3s infinite;
-        }
-
-        @keyframes colorChange {
-            0% {
-                color: #4caf50;
-            }
-
-            50% {
-                color: #e91e63;
-            }
-
-            100% {
-                color: #2196f3;
-            }
-        }
-
-        .form-signin .form-floating {
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .form-signin .form-control {
-            border-radius: 8px;
-            padding: 15px;
-            font-size: 1rem;
-            border: 1px solid #ccc;
-            transition: all 0.3s;
-        }
-
-        .form-signin .form-control:focus {
-            border-color: #00796b;
-            box-shadow: 0 0 5px rgba(0, 121, 107, 0.5);
-        }
-
-        .form-signin label {
-            position: absolute;
-            top: 50%;
-            left: 10px;
-            transform: translateY(-50%);
-            font-size: 0.9rem;
-            color: #777;
-            pointer-events: none;
-            transition: all 0.2s;
-        }
-
-        .form-signin .form-control:focus+label,
-        .form-signin .form-control:not(:placeholder-shown)+label {
-            top: 5px;
-            left: 8px;
-            font-size: 0.8rem;
-            color: #00796b;
-        }
-
-        .form-signin .btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(90deg, #4caf50, #8bc34a);
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            color: #fff;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .form-signin .btn:hover {
-            background: linear-gradient(90deg, #8bc34a, #4caf50);
-            transform: scale(1.05);
-        }
-
-        .form-signin .form-check {
-            color: #00796b;
-            margin-top: 10px;
-        }
-
-        .form-signin .form-check input {
-            margin-right: 0.5em;
-        }
-
-        .form-signin .copyright {
-            text-align: center;
-            color: #555;
-            margin-top: 20px;
-            font-size: 0.85em;
-        }
-
-        .form-signin .copyright a {
-            color: #00796b;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .form-signin .copyright a:hover {
-            text-decoration: underline;
-        }
-    </style>
-</head>
-
-<body translate="no">
-    <div class="bg"></div>
-
-    <main class="form-signin">
-        <h1 class="heading">Disease Detection With Drug Recommendation</h1>
-        <h1>Login</h1>
-
-        <form class="login" method="POST" action="/login.validation">
-            <div class="form-floating">
-                <input type="email" class="form-control" name="username" id="floatingInput" size="30"
-                    placeholder="priyanshu@example.com" required>
-                <label for="floatingInput"></label>
-            </div>
-
-            <div class="form-floating">
-                <input type="password" class="form-control" name="password" id="floatingPassword" size="30"
-                    placeholder="Password" required>
-                <label for="floatingPassword"></label>
-            </div>
-
-            <div class="checkbox mb-3">
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" value="1" name="remember_me" id="rememberMeSwitch">
-                    <label class="form-check-label" for="rememberMeSwitch"></label>
-                </div>
-            </div>
-
-            <button class="btn btn-lg" type="submit">Sign in</button>
-        </form>
-
-        <p class="copyright">&copy; <a href="#">Priyanshu Singh</a> - Disease Detection System</p>
-    </main>
-</body>
-
-</html>
+      <div class="demo-note">
+        Demo login:<br>
+        Email <code>priyansh@gmail.com</code><br>
+        Password <code>priyansh</code>
+      </div>
+    </section>
+  </div>
+</main>
+{% endblock %}
