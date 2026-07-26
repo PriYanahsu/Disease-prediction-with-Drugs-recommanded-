@@ -47,6 +47,7 @@ Clone the repository to your local machine:
 Install the required Python libraries:
 
     pip install -r requirements.txt
+    python -c "import nltk; nltk.download('stopwords'); nltk.download('wordnet'); nltk.download('omw-1.4')"
 
 ### 3. Train the Model
 If you'd like to retrain the model:
@@ -58,15 +59,51 @@ If you'd like to retrain the model:
    * Train and evaluate the machine learning model.
 3. Save the trained model as model.pkl.
 
-#### Note: A pre-trained model is already included in the repository.
+#### Note: A pre-trained model is already included in the repository (`model/passmodelAce.pkl` + `model/tfidfvectorizerAce.pkl`).
 
-### 4. Run the Flask
-Run the flask app with the following command:
+### 4. Run the Flask app locally
 
-    python -m flask run
+    python app.py
+    # or
+    gunicorn wsgi:app --bind 0.0.0.0:8080
 
-### 5. Open the App in Your Browser
-After running the above command, Streamlit will start a local server and provide a URL. Open the URL in your browser (default: http://localhost:8501).
+Open http://localhost:8080
+
+Default login: `priyansh@gmail.com` / `priyansh`
+
+---
+
+## Deploy
+
+Deploy artifacts included: `Dockerfile`, `Procfile`, `runtime.txt`, `render.yaml`, slim `requirements.txt`.
+
+### Option A — Render (recommended)
+1. Push this folder to GitHub.
+2. [Render](https://render.com) → New → Web Service → connect the repo.
+3. Or use Blueprint with `render.yaml`.
+4. Settings if manual:
+   - **Runtime:** Python 3.11
+   - **Build:** `pip install -r requirements.txt && python -c "import nltk; nltk.download('stopwords'); nltk.download('wordnet'); nltk.download('omw-1.4')"`
+   - **Start:** `gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120`
+5. Set env var `SECRET_KEY` to any long random string.
+6. Use at least **1GB RAM** if free tier OOMs (model + CSV ~130MB in memory).
+
+### Option B — Railway
+1. New project → Deploy from GitHub.
+2. Railway detects `Procfile` / Dockerfile.
+3. Set `SECRET_KEY`.
+
+### Option C — Docker (local / HF Spaces / any VPS)
+
+    docker build -t disease-drug-recom .
+    docker run -p 8080:8080 -e SECRET_KEY=change-me disease-drug-recom
+
+For Hugging Face Spaces: create a Docker Space, upload/push this repo (with `Dockerfile` at root of the Space).
+
+### What gets shipped
+- Runtime models: `passmodelAce.pkl`, `tfidfvectorizerAce.pkl`
+- Drug table: `data/drugsComTrain_raw.csv`
+- Alternate unused `.pkl` files are excluded from the Docker image via `.dockerignore`
 
 ## Screenshot
  ### 1. Login first

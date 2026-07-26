@@ -1,0 +1,21 @@
+.venv
+venv
+__pycache__
+**/__pycache__
+*.pyc
+.vscode
+.git
+.gitignore
+.env
+.ipynb_checkpoints
+Project Jupyter
+temp_rem
+*.md
+!README.md
+# unused alternate model artifacts (Ace pair is what app loads)
+model/passmodel.pkl
+model/passmodel2.pkl
+model/passmodel3.pkl
+model/tfidfvectorizer.pkl
+model/tfidfvectorizer2.pkl
+model/tfidfvectorizer3.pkl

@@ -10,20 +10,23 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from collections import Counter
 from collections import defaultdict
+from dotenv import load_dotenv
 
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
+app.secret_key = os.environ.get("SECRET_KEY", "dev-only-change-me")
 
 # === Paths ===
 MODEL_PATH = 'model/passmodelAce.pkl'
 TOKENIZER_PATH = 'model/tfidfvectorizerAce.pkl'
 DATA_PATH = 'data/drugsComTrain_raw.csv'
-LOG_PATH = 'data/tested_cases.csv'  
+LOG_PATH = 'data/tested_cases.csv'
 
-# === Load model and vectorizer ===
+# === Load model, vectorizer, and drug table once (avoid re-reading ~80MB CSV per request) ===
 model = joblib.load(MODEL_PATH)
 vectorizer = joblib.load(TOKENIZER_PATH)
+df_drugs = pd.read_csv(DATA_PATH)
 
 # === NLP Setup ===
 stop = stopwords.words('english')
@@ -81,9 +84,7 @@ def predict():
         prediction = model.predict(tfidf_vect)
         predicted_cond = prediction[0]
 
-        # Load drug data and extract top drugs
-        df = pd.read_csv(DATA_PATH)
-        top_drugs = top_drugs_extractor(predicted_cond, df)
+        top_drugs = top_drugs_extractor(predicted_cond, df_drugs)
 
         # Save all fields + prediction to CSV log
         save_tested_case(name, age, gender, height, weight, location, raw_text, predicted_cond)
@@ -197,4 +198,5 @@ def save_tested_case(name, age, gender, height, weight, location, rawtext, condi
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="localhost", port=8080)
+    port = int(os.environ.get("PORT", 8080))
+    app.run(debug=os.environ.get("FLASK_DEBUG") == "1", host="0.0.0.0", port=port)
