@@ -6,45 +6,40 @@
   <div class="auth-shell">
     <section class="auth-hero">
       <div>
-        <div class="eyebrow">ML product · symptom classifier</div>
-        <h1>MediGuide</h1>
-        <p>An inference UI for a trained text classifier. Feed symptom language, get a ranked condition prediction and dataset-backed drug suggestions.</p>
+        <div class="eyebrow">Symptom → condition classifier</div>
+        <h1 class="auth-brand">Medi<em>Guide</em></h1>
+        <p class="lede">Train-backed inference UI. Paste symptom language, get a ranked condition prediction and dataset drug suggestions.</p>
         <ul class="hero-points">
           <li>TF-IDF + PassiveAggressive multi-class model</li>
-          <li>Confidence + alternate class ranking</li>
+          <li>Softmax confidence + alternate rankings</li>
           <li>Top-rated drug retrieval by predicted label</li>
         </ul>
-        <div class="hero-tech mono">
-          <span>vectorizer: TF-IDF</span>
-          <span>model: PassiveAggressive</span>
-          <span>task: text → condition</span>
-        </div>
       </div>
       <p class="auth-disclaimer">Educational ML demo — not a medical diagnosis.</p>
     </section>
 
     <section class="auth-form-wrap">
       <h2>Sign in</h2>
-      <p class="sub">Enter the workspace to run predictions.</p>
+      <p class="sub">Open the inference workspace.</p>
 
       {% if error %}
       <div class="alert alert-error">{{ error }}</div>
       {% endif %}
 
       <form method="POST" action="{{ url_for('login_validation') }}" autocomplete="on">
-        <div class="field">
+        <div class="field" style="margin-bottom:0.85rem;">
           <label for="username">Email</label>
           <input id="username" type="email" name="username" placeholder="you@example.com" required autofocus>
         </div>
-        <div class="field">
+        <div class="field" style="margin-bottom:0.85rem;">
           <label for="password">Password</label>
           <input id="password" type="password" name="password" placeholder="Enter password" required>
         </div>
-        <button class="btn btn-primary" type="submit">Open inference workspace</button>
+        <button class="btn btn-primary" type="submit">Enter workspace</button>
       </form>
 
       <div class="demo-note">
-        Demo login:<br>
+        Demo login<br>
         Email <code>priyansh@gmail.com</code><br>
         Password <code>priyansh</code>
       </div>

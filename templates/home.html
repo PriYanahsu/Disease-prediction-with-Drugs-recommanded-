@@ -1,95 +1,128 @@
 {% extends "base.html" %}
-{% block title %}Run model · MediGuide{% endblock %}
+{% block title %}Predict · MediGuide{% endblock %}
 
 {% block body %}
 <main class="page">
   <div class="shell">
-    <div class="page-head ml-head">
-      <div class="badge-row">
-        <span class="pill pill-live"><span class="dot"></span> Model online</span>
-        <span class="pill mono">{{ model_meta.name }}</span>
-        <span class="pill mono">{{ model_meta.vectorizer }}</span>
-        <span class="pill mono">{{ model_meta.classes }} classes</span>
+    <div class="page-head">
+      <div class="page-kicker">
+        <span class="status"><span class="dot"></span> model online</span>
+        <span class="meta-tag">{{ model_meta.name }}</span>
+        <span class="meta-tag">{{ model_meta.vectorizer }}</span>
+        <span class="meta-tag">{{ model_meta.classes }} classes</span>
       </div>
-      <h1>ML condition prediction</h1>
-      <p>This is a machine-learning inference workspace — not a doctor. Paste symptoms, run the trained classifier, and get a ranked condition prediction plus drug suggestions from the dataset.</p>
+      <h1>Run condition prediction</h1>
+      <p>Paste symptoms as free text — that’s the only model feature. Patient fields are logged with the run; they don’t affect the classifier.</p>
     </div>
 
-    <div class="pipeline" aria-label="ML pipeline">
-      <div class="pipe-step">
-        <span class="pipe-code">01</span>
-        <strong>Input</strong>
-        <span>Patient + symptoms</span>
-      </div>
-      <div class="pipe-arrow" aria-hidden="true">→</div>
-      <div class="pipe-step">
-        <span class="pipe-code">02</span>
-        <strong>NLP</strong>
-        <span>Clean · lemma · TF-IDF</span>
-      </div>
-      <div class="pipe-arrow" aria-hidden="true">→</div>
-      <div class="pipe-step">
-        <span class="pipe-code">03</span>
-        <strong>Classify</strong>
-        <span>PassiveAggressive</span>
-      </div>
-      <div class="pipe-arrow" aria-hidden="true">→</div>
-      <div class="pipe-step">
-        <span class="pipe-code">04</span>
-        <strong>Recommend</strong>
-        <span>Top-rated drugs</span>
-      </div>
+    <div class="workspace">
+      <section class="surface">
+        <div class="surface-head">
+          <span>Inference input</span>
+          <span class="endpoint">POST /predict</span>
+        </div>
+
+        <form method="POST" action="{{ url_for('predict') }}" id="predict-form">
+          <div class="grid-2">
+            <div class="field">
+              <label for="name">Full name</label>
+              <input id="name" type="text" name="name" placeholder="e.g. Priyanshu Singh" autocomplete="name" required>
+            </div>
+            <div class="field">
+              <label for="age">Age</label>
+              <input id="age" type="number" name="age" min="1" max="120" inputmode="numeric" placeholder="e.g. 24" required>
+            </div>
+            <div class="field">
+              <label for="gender">Gender</label>
+              <select id="gender" name="gender" required>
+                <option value="" disabled selected>Select gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="location">Location</label>
+              <input id="location" type="text" name="location" placeholder="City / area" autocomplete="address-level2" required>
+            </div>
+            <div class="field">
+              <label for="height">Height (cm)</label>
+              <input id="height" type="number" name="height" min="50" max="250" inputmode="numeric" placeholder="e.g. 170" required>
+            </div>
+            <div class="field">
+              <label for="weight">Weight (kg)</label>
+              <input id="weight" type="number" name="weight" min="10" max="300" inputmode="numeric" placeholder="e.g. 65" required>
+            </div>
+            <div class="field full">
+              <label for="msg">Symptom text <span class="label-tag">model feature</span></label>
+              <p class="hint">Example: “fever, body ache, dry cough for 3 days.”</p>
+              <textarea id="msg" name="rawtext" rows="5" placeholder="Describe symptoms in plain English…" required></textarea>
+            </div>
+          </div>
+          <div class="form-footer">
+            <button class="btn btn-primary" type="submit" id="predict-submit">Run prediction</button>
+            <a class="btn btn-ghost" href="{{ url_for('view_tests') }}">View history</a>
+          </div>
+        </form>
+      </section>
+
+      <aside class="side-stack">
+        <div class="model-side">
+          <div class="side-label">Loaded pipeline</div>
+          <h3>{{ model_meta.name }}</h3>
+          <dl class="model-rows">
+            <div>
+              <dt>vectorizer</dt>
+              <dd>{{ model_meta.vectorizer }}</dd>
+            </div>
+            <div>
+              <dt>classes</dt>
+              <dd>{{ model_meta.classes }}</dd>
+            </div>
+            <div>
+              <dt>task</dt>
+              <dd>text → condition</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="surface">
+          <div class="surface-head">
+            <span>Pipeline</span>
+          </div>
+          <div class="pipe-vertical">
+            <div class="pipe-item">
+              <span class="pipe-num">01</span>
+              <div>
+                <strong>Input</strong>
+                <span>Patient metadata + symptom text</span>
+              </div>
+            </div>
+            <div class="pipe-item">
+              <span class="pipe-num">02</span>
+              <div>
+                <strong>NLP</strong>
+                <span>Clean · lemmatize · TF-IDF</span>
+              </div>
+            </div>
+            <div class="pipe-item">
+              <span class="pipe-num">03</span>
+              <div>
+                <strong>Classify</strong>
+                <span>PassiveAggressive softmax ranking</span>
+              </div>
+            </div>
+            <div class="pipe-item">
+              <span class="pipe-num">04</span>
+              <div>
+                <strong>Recommend</strong>
+                <span>Top-rated drugs for predicted class</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
     </div>
-
-    <section class="panel">
-      <div class="panel-label">
-        <span>Inference input</span>
-        <span class="mono muted-sm">POST /predict</span>
-      </div>
-
-      <form method="POST" action="{{ url_for('predict') }}" id="predict-form">
-        <div class="grid-2">
-          <div class="field">
-            <label for="name">Full name</label>
-            <input id="name" type="text" name="name" placeholder="e.g. Priyanshu Singh" autocomplete="name" required>
-          </div>
-          <div class="field">
-            <label for="age">Age</label>
-            <input id="age" type="number" name="age" min="1" max="120" inputmode="numeric" placeholder="e.g. 24" required>
-          </div>
-          <div class="field">
-            <label for="gender">Gender</label>
-            <select id="gender" name="gender" required>
-              <option value="" disabled selected>Select gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="location">Location</label>
-            <input id="location" type="text" name="location" placeholder="City / area" autocomplete="address-level2" required>
-          </div>
-          <div class="field">
-            <label for="height">Height (cm)</label>
-            <input id="height" type="number" name="height" min="50" max="250" inputmode="numeric" placeholder="e.g. 170" required>
-          </div>
-          <div class="field">
-            <label for="weight">Weight (kg)</label>
-            <input id="weight" type="number" name="weight" min="10" max="300" inputmode="numeric" placeholder="e.g. 65" required>
-          </div>
-          <div class="field full">
-            <label for="msg">Symptom text <span class="label-tag">model feature</span></label>
-            <p class="hint">This free-text is the only feature the classifier uses. Example: “fever, body ache, dry cough for 3 days.”</p>
-            <textarea id="msg" name="rawtext" rows="5" placeholder="Describe symptoms in plain English…" required></textarea>
-          </div>
-        </div>
-        <div class="actions sticky-actions">
-          <button class="btn btn-primary" type="submit" id="predict-submit">Run ML prediction</button>
-          <a class="btn btn-ghost" href="{{ url_for('view_tests') }}">Past runs</a>
-        </div>
-      </form>
-    </section>
 
     <p class="footer-note">Educational ML demo · model output ≠ medical diagnosis</p>
   </div>

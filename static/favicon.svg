@@ -1,11 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="MediGuide">
-  <defs>
-    <linearGradient id="g" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#148f89"/>
-      <stop offset="1" stop-color="#0a4f4c"/>
-    </linearGradient>
-  </defs>
-  <rect width="64" height="64" rx="14" fill="url(#g)"/>
-  <path d="M18 46V18h7.2l6.8 16.8L38.8 18H46v28h-6.2V28.4L33.2 46h-6.4l-6.6-17.6V46H18z" fill="#fff"/>
-  <circle cx="48" cy="14" r="5" fill="#9be7e1"/>
+  <rect width="64" height="64" rx="14" fill="#0c1222"/>
+  <path d="M18 46V18h7.2l6.8 16.8L38.8 18H46v28h-6.2V28.4L33.2 46h-6.4l-6.6-17.6V46H18z" fill="#c8f542"/>
+  <rect x="46" y="10" width="8" height="8" rx="2" fill="#0b5fff"/>
 </svg>

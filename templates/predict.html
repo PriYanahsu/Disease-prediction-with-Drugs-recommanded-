@@ -1,132 +1,129 @@
 {% extends "base.html" %}
-{% block title %}Inference result · MediGuide{% endblock %}
+{% block title %}Result · MediGuide{% endblock %}
 
 {% block body %}
 <main class="page">
   <div class="shell">
-    <div class="page-head ml-head">
-      <div class="badge-row">
-        <span class="pill pill-live"><span class="dot"></span> Inference complete</span>
-        <span class="pill mono">{{ model_meta.name }}</span>
+    <div class="page-head">
+      <div class="page-kicker">
+        <span class="status"><span class="dot"></span> inference complete</span>
+        <span class="meta-tag">{{ model_meta.name }}</span>
         {% if confidence is not none %}
-        <span class="pill mono">confidence {{ confidence }}%</span>
+        <span class="meta-tag">{{ confidence }}% confidence</span>
         {% endif %}
       </div>
       <h1>Model output</h1>
-      <p>Ranked class prediction from TF-IDF features. Treat this as an ML estimate — verify with a clinician before any medication.</p>
+      <p>Ranked class from TF-IDF features. Treat as an ML estimate — verify with a clinician before any medication.</p>
     </div>
 
     {% if error %}
     <div class="alert alert-error">{{ error }}</div>
     {% endif %}
 
-    <section class="panel result-panel">
+    <div class="result-layout">
       {% if result %}
-      <div class="result-hero">
-        <div class="result-hero-top">
-          <div>
-            <div class="result-hero-label">Top predicted class</div>
-            <p class="result-hero-value">{{ result }}</p>
-          </div>
-          {% if confidence is not none %}
-          <div class="confidence-ring" style="--p: {{ confidence }};" title="Model confidence">
-            <strong>{{ confidence }}%</strong>
-            <span>conf.</span>
+      <section class="prediction-banner">
+        <div>
+          <div class="eyebrow">Top predicted class</div>
+          <h2>{{ result }}</h2>
+          {% if name or age or gender %}
+          <div class="patient-chips">
+            {% if name %}<span class="chip">{{ name }}</span>{% endif %}
+            {% if age %}<span class="chip">Age {{ age }}</span>{% endif %}
+            {% if gender %}<span class="chip">{{ gender }}</span>{% endif %}
+            {% if location %}<span class="chip">{{ location }}</span>{% endif %}
+            {% if height %}<span class="chip">{{ height }} cm</span>{% endif %}
+            {% if weight %}<span class="chip">{{ weight }} kg</span>{% endif %}
           </div>
           {% endif %}
         </div>
-
         {% if confidence is not none %}
-        <div class="conf-bar" aria-hidden="true">
-          <div class="conf-fill" style="width: {{ confidence }}%;"></div>
-        </div>
-        <p class="conf-caption mono">softmax(decision_function) · top class share</p>
-        {% endif %}
-
-        {% if name or age or gender %}
-        <div class="meta-row">
-          {% if name %}<span class="chip">{{ name }}</span>{% endif %}
-          {% if age %}<span class="chip">Age {{ age }}</span>{% endif %}
-          {% if gender %}<span class="chip">{{ gender }}</span>{% endif %}
-          {% if location %}<span class="chip">{{ location }}</span>{% endif %}
-          {% if height %}<span class="chip">{{ height }} cm</span>{% endif %}
-          {% if weight %}<span class="chip">{{ weight }} kg</span>{% endif %}
+        <div class="conf-meter">
+          <div class="ring" data-pct="{{ confidence }}">
+            <div>
+              <strong>{{ confidence }}%</strong>
+              <span>conf</span>
+            </div>
+          </div>
+          <div class="caption">softmax · top share</div>
         </div>
         {% endif %}
-      </div>
+      </section>
       {% endif %}
 
-      <div class="result-grid">
-        <div class="result-card">
-          <h3>Class ranking</h3>
-          {% if top_predictions %}
-          <ul class="rank-list">
-            {% for item in top_predictions %}
-            <li class="{% if loop.first %}is-top{% endif %}">
-              <div class="rank-meta">
-                <span class="rank-pos">#{{ loop.index }}</span>
-                <strong>{{ item.label }}</strong>
-                <span class="mono">{{ item.confidence }}%</span>
-              </div>
-              <div class="mini-bar"><span style="width: {{ item.confidence }}%;"></span></div>
-            </li>
-            {% endfor %}
-          </ul>
-          {% else %}
-          <p class="muted">No ranking available.</p>
-          {% endif %}
-        </div>
-
-        <div class="result-card">
-          <h3>NLP tokens used</h3>
-          {% if tokens %}
-          <div class="token-cloud">
-            {% for t in tokens %}
-            <code>{{ t }}</code>
-            {% endfor %}
+      <section class="surface">
+        <div class="result-cols">
+          <div class="result-block">
+            <h3>Class ranking</h3>
+            {% if top_predictions %}
+            <ul class="rank-list">
+              {% for item in top_predictions %}
+              <li class="{% if loop.first %}is-top{% endif %}">
+                <div class="rank-meta">
+                  <span class="rank-pos">#{{ loop.index }}</span>
+                  <strong>{{ item.label }}</strong>
+                  <span class="mono" style="font-size:0.78rem;color:var(--muted);">{{ item.confidence }}%</span>
+                </div>
+                <div class="mini-bar"><span data-pct="{{ item.confidence }}"></span></div>
+              </li>
+              {% endfor %}
+            </ul>
+            {% else %}
+            <p class="muted">No ranking available.</p>
+            {% endif %}
           </div>
-          {% else %}
-          <p class="muted">No tokens extracted.</p>
-          {% endif %}
-          <p class="symptom-text" style="margin-top:0.85rem;">{{ rawtext or "No symptoms provided." }}</p>
+
+          <div class="result-block">
+            <h3>NLP tokens</h3>
+            {% if tokens %}
+            <div class="token-cloud">
+              {% for t in tokens %}
+              <code>{{ t }}</code>
+              {% endfor %}
+            </div>
+            {% else %}
+            <p class="muted">No tokens extracted.</p>
+            {% endif %}
+            <p class="symptom-text">{{ rawtext or "No symptoms provided." }}</p>
+          </div>
+
+          <div class="result-block">
+            <h3>Drug retrieval</h3>
+            <p class="hint" style="margin:0 0 0.75rem;font-size:0.78rem;color:var(--muted);">rating ≥ 9 · usefulCount ≥ 100</p>
+            {% if top_drugs and top_drugs|length > 0 %}
+            <ol class="drug-list">
+              {% for drug in top_drugs %}
+              <li><span class="rank">{{ loop.index }}</span><span>{{ drug }}</span></li>
+              {% endfor %}
+            </ol>
+            {% else %}
+            <p class="muted">No high-rated drug matches for this class.</p>
+            {% endif %}
+          </div>
         </div>
 
-        <div class="result-card full-span">
-          <h3>Drug retrieval <span class="label-tag">post-model</span></h3>
-          <p class="hint" style="margin-bottom:0.75rem;">Pulled from training data where rating ≥ 9 and usefulCount ≥ 100 for the predicted condition.</p>
-          {% if top_drugs and top_drugs|length > 0 %}
-          <ol class="drug-list ranked">
-            {% for drug in top_drugs %}
-            <li><span class="rank">{{ loop.index }}</span><span>{{ drug }}</span></li>
-            {% endfor %}
-          </ol>
-          {% else %}
-          <p class="muted">No high-rated drug matches for this predicted class.</p>
-          {% endif %}
+        <div class="pipe-footer" style="margin-top:1.25rem;">
+          <div>
+            <span class="lbl">pipeline</span>
+            <strong>symptoms → TF-IDF → {{ model_meta.name }} → drugs</strong>
+          </div>
+          <div>
+            <span class="lbl">classes</span>
+            <strong>{{ model_meta.classes }}</strong>
+          </div>
+          <div>
+            <span class="lbl">vectorizer</span>
+            <strong>{{ model_meta.vectorizer }}</strong>
+          </div>
         </div>
-      </div>
 
-      <div class="model-card">
-        <div>
-          <span class="mono muted-sm">pipeline</span>
-          <strong>symptoms → TF-IDF → {{ model_meta.name }} → drugs</strong>
+        <div class="actions">
+          <a class="btn btn-primary" href="{{ url_for('index') }}">New prediction</a>
+          <a class="btn btn-ghost" href="{{ url_for('view_tests') }}">History</a>
+          <a class="btn btn-ghost" href="{{ url_for('analytics') }}">Analytics</a>
         </div>
-        <div>
-          <span class="mono muted-sm">classes</span>
-          <strong>{{ model_meta.classes }}</strong>
-        </div>
-        <div>
-          <span class="mono muted-sm">vectorizer</span>
-          <strong>{{ model_meta.vectorizer }}</strong>
-        </div>
-      </div>
-
-      <div class="actions" style="margin-top:1.25rem;">
-        <a class="btn btn-primary" href="{{ url_for('index') }}">New inference</a>
-        <a class="btn btn-ghost" href="{{ url_for('view_tests') }}">Runs</a>
-        <a class="btn btn-ghost" href="{{ url_for('analytics') }}">Analytics</a>
-      </div>
-    </section>
+      </section>
+    </div>
 
     <p class="footer-note">Model estimate only · always consult a doctor before medication</p>
   </div>

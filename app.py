@@ -203,6 +203,17 @@ def view_tests():
     return render_template("view_tests.html", show_nav=True, tested_cases=tested_cases)
 
 
+@app.route("/clear_history", methods=["POST"])
+@login_required
+def clear_history():
+    try:
+        if os.path.exists(LOG_PATH):
+            os.remove(LOG_PATH)
+    except Exception as e:
+        print(f"Error clearing history: {e}")
+    return redirect(url_for("view_tests"))
+
+
 @app.route("/analytics")
 @login_required
 def analytics():

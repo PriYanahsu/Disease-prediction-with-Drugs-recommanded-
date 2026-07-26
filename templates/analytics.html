@@ -9,8 +9,11 @@
 <main class="page">
   <div class="shell">
     <div class="page-head">
+      <div class="page-kicker">
+        <span class="meta-tag">run telemetry</span>
+      </div>
       <h1>Analytics</h1>
-      <p>Quick view of predicted conditions and daily activity from your saved tests.</p>
+      <p>Condition distribution and daily activity from saved inference runs.</p>
     </div>
 
     <div class="stat-grid">
@@ -28,7 +31,7 @@
       </div>
     </div>
 
-    <section class="panel charts">
+    <section class="surface charts">
       {% if condition_counts %}
       <div class="chart-box">
         <h3>Condition counts</h3>
@@ -40,7 +43,7 @@
       </div>
       {% else %}
       <div class="empty">
-        <p>No analytics data yet. Predictions will show up here automatically.</p>
+        <p>No analytics yet. Predictions show up here automatically.</p>
         <a class="btn btn-primary" href="{{ url_for('index') }}">Make a prediction</a>
       </div>
       {% endif %}
@@ -57,7 +60,15 @@
 <script>
   const conditionCounts = {{ condition_counts | tojson }};
   const dailyCounts = {{ daily_counts | tojson }};
-  const brand = "#0f6e6a";
+  const brand = "#0b5fff";
+  const brandSoft = "rgba(11, 95, 255, 0.16)";
+  const grid = "rgba(12, 18, 34, 0.08)";
+  const tick = "#5b6b82";
+
+  const axisOpts = {
+    grid: { color: grid },
+    ticks: { color: tick, font: { family: "IBM Plex Mono", size: 11 } }
+  };
 
   new Chart(document.getElementById("conditionChart"), {
     type: "bar",
@@ -67,13 +78,17 @@
         label: "Count",
         data: Object.values(conditionCounts),
         backgroundColor: brand,
-        borderRadius: 8
+        borderRadius: 6,
+        maxBarThickness: 36
       }]
     },
     options: {
       responsive: true,
       plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+      scales: {
+        x: axisOpts,
+        y: { beginAtZero: true, ticks: { ...axisOpts.ticks, precision: 0 }, grid: axisOpts.grid }
+      }
     }
   });
 
@@ -85,14 +100,20 @@
         label: "Predictions",
         data: Object.values(dailyCounts),
         borderColor: brand,
-        backgroundColor: "rgba(15,110,106,0.15)",
+        backgroundColor: brandSoft,
         fill: true,
-        tension: 0.35
+        tension: 0.35,
+        pointRadius: 3,
+        pointBackgroundColor: brand
       }]
     },
     options: {
       responsive: true,
-      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+      plugins: { legend: { display: false } },
+      scales: {
+        x: axisOpts,
+        y: { beginAtZero: true, ticks: { ...axisOpts.ticks, precision: 0 }, grid: axisOpts.grid }
+      }
     }
   });
 </script>

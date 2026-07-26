@@ -5,11 +5,14 @@
 <main class="page">
   <div class="shell">
     <div class="page-head">
-      <h1>Past tested cases</h1>
-      <p>Every prediction you run is saved here so you can review previous inputs and outcomes.</p>
+      <div class="page-kicker">
+        <span class="meta-tag">{{ tested_cases|length }} logged runs</span>
+      </div>
+      <h1>Prediction history</h1>
+      <p>Every inference is appended here — review past inputs and predicted conditions.</p>
     </div>
 
-    <section class="panel">
+    <section class="surface">
       {% if tested_cases and tested_cases|length > 0 %}
       <div class="table-wrap">
         <table class="data">
@@ -43,7 +46,7 @@
         </table>
       </div>
 
-      <div class="history-cards" aria-hidden="false">
+      <div class="history-cards">
         {% for case in tested_cases|reverse %}
         <article class="history-card">
           <div class="history-card-top">
@@ -51,7 +54,7 @@
             <span class="cell-sub">{{ case.timestamp or "" }}</span>
           </div>
           <p class="clamp">{{ case.input or "—" }}</p>
-          <div class="meta-row">
+          <div class="patient-chips">
             {% if case.name %}<span class="chip">{{ case.name }}</span>{% endif %}
             {% if case.age %}<span class="chip">{{ case.age }} yrs</span>{% endif %}
             {% if case.gender %}<span class="chip">{{ case.gender }}</span>{% endif %}
@@ -62,14 +65,20 @@
       </div>
       {% else %}
       <div class="empty">
-        <p>No tests yet. Run your first prediction to see history here.</p>
-        <a class="btn btn-primary" href="{{ url_for('index') }}">Start predicting</a>
+        <p>No runs yet. Fire your first prediction to populate history.</p>
+        <a class="btn btn-primary" href="{{ url_for('index') }}">Run prediction</a>
       </div>
       {% endif %}
 
-      <div class="actions" style="margin-top:1.1rem;">
+      <div class="actions" style="margin-top:1.15rem;">
         <a class="btn btn-ghost" href="{{ url_for('index') }}">Back to predict</a>
         <a class="btn btn-ghost" href="{{ url_for('analytics') }}">Open analytics</a>
+        {% if tested_cases and tested_cases|length > 0 %}
+        <form method="POST" action="{{ url_for('clear_history') }}" style="display:inline;margin:0;"
+              onsubmit="return confirm('Delete all prediction history? This cannot be undone.');">
+          <button class="btn btn-danger" type="submit">Delete history</button>
+        </form>
+        {% endif %}
       </div>
     </section>
   </div>
