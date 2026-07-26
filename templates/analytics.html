@@ -84,9 +84,19 @@
     },
     options: {
       responsive: true,
+      maintainAspectRatio: true,
       plugins: { legend: { display: false } },
       scales: {
-        x: axisOpts,
+        x: {
+          ...axisOpts,
+          ticks: {
+            ...axisOpts.ticks,
+            maxRotation: 45,
+            minRotation: 0,
+            autoSkip: true,
+            maxTicksLimit: window.innerWidth < 640 ? 6 : 12
+          }
+        },
         y: { beginAtZero: true, ticks: { ...axisOpts.ticks, precision: 0 }, grid: axisOpts.grid }
       }
     }
@@ -103,15 +113,24 @@
         backgroundColor: brandSoft,
         fill: true,
         tension: 0.35,
-        pointRadius: 3,
+        pointRadius: window.innerWidth < 640 ? 2 : 3,
         pointBackgroundColor: brand
       }]
     },
     options: {
       responsive: true,
+      maintainAspectRatio: true,
       plugins: { legend: { display: false } },
       scales: {
-        x: axisOpts,
+        x: {
+          ...axisOpts,
+          ticks: {
+            ...axisOpts.ticks,
+            maxRotation: 45,
+            autoSkip: true,
+            maxTicksLimit: window.innerWidth < 640 ? 5 : 10
+          }
+        },
         y: { beginAtZero: true, ticks: { ...axisOpts.ticks, precision: 0 }, grid: axisOpts.grid }
       }
     }

@@ -18,17 +18,31 @@
     ? overlay.querySelectorAll(".overlay-pipeline li")
     : [];
 
+  function closeNav() {
+    if (!navToggle || !navLinks) return;
+    navLinks.classList.remove("open");
+    navToggle.setAttribute("aria-expanded", "false");
+  }
+
   if (navToggle && navLinks) {
-    navToggle.addEventListener("click", function () {
+    navToggle.addEventListener("click", function (e) {
+      e.stopPropagation();
       const open = navLinks.classList.toggle("open");
       navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+
+    navLinks.querySelectorAll("a").forEach(function (link) {
+      link.addEventListener("click", closeNav);
     });
 
     document.addEventListener("click", function (e) {
       if (!navLinks.classList.contains("open")) return;
       if (navToggle.contains(e.target) || navLinks.contains(e.target)) return;
-      navLinks.classList.remove("open");
-      navToggle.setAttribute("aria-expanded", "false");
+      closeNav();
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeNav();
     });
   }
 

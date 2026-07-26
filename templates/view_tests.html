@@ -70,11 +70,11 @@
       </div>
       {% endif %}
 
-      <div class="actions" style="margin-top:1.15rem;">
+      <div class="actions actions-bar">
         <a class="btn btn-ghost" href="{{ url_for('index') }}">Back to predict</a>
         <a class="btn btn-ghost" href="{{ url_for('analytics') }}">Open analytics</a>
         {% if tested_cases and tested_cases|length > 0 %}
-        <form method="POST" action="{{ url_for('clear_history') }}" style="display:inline;margin:0;"
+        <form class="inline-form" method="POST" action="{{ url_for('clear_history') }}"
               onsubmit="return confirm('Delete all prediction history? This cannot be undone.');">
           <button class="btn btn-danger" type="submit">Delete history</button>
         </form>

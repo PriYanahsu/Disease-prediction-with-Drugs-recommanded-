@@ -62,7 +62,7 @@
                 <div class="rank-meta">
                   <span class="rank-pos">#{{ loop.index }}</span>
                   <strong>{{ item.label }}</strong>
-                  <span class="mono" style="font-size:0.78rem;color:var(--muted);">{{ item.confidence }}%</span>
+                  <span class="rank-pct">{{ item.confidence }}%</span>
                 </div>
                 <div class="mini-bar"><span data-pct="{{ item.confidence }}"></span></div>
               </li>
@@ -89,7 +89,7 @@
 
           <div class="result-block">
             <h3>Drug retrieval</h3>
-            <p class="hint" style="margin:0 0 0.75rem;font-size:0.78rem;color:var(--muted);">rating ≥ 9 · usefulCount ≥ 100</p>
+            <p class="hint-sm">rating ≥ 9 · usefulCount ≥ 100</p>
             {% if top_drugs and top_drugs|length > 0 %}
             <ol class="drug-list">
               {% for drug in top_drugs %}
@@ -102,7 +102,7 @@
           </div>
         </div>
 
-        <div class="pipe-footer" style="margin-top:1.25rem;">
+        <div class="pipe-footer">
           <div>
             <span class="lbl">pipeline</span>
             <strong>symptoms → TF-IDF → {{ model_meta.name }} → drugs</strong>

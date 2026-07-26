@@ -5,9 +5,9 @@
 <main class="auth-page">
   <div class="auth-shell">
     <section class="auth-hero">
-      <div>
-        <div class="eyebrow">Symptom → condition classifier</div>
-        <h1 class="auth-brand">Medi<em>Guide</em></h1>
+      <div class="auth-hero-top">
+        <p class="eyebrow">Symptom → condition classifier</p>
+        <h1 class="auth-brand">Medi<span>Guide</span></h1>
         <p class="lede">Train-backed inference UI. Paste symptom language, get a ranked condition prediction and dataset drug suggestions.</p>
         <ul class="hero-points">
           <li>TF-IDF + PassiveAggressive multi-class model</li>
@@ -19,29 +19,31 @@
     </section>
 
     <section class="auth-form-wrap">
-      <h2>Sign in</h2>
-      <p class="sub">Open the inference workspace.</p>
+      <div class="auth-form-inner">
+        <h2>Sign in</h2>
+        <p class="sub">Open the inference workspace.</p>
 
-      {% if error %}
-      <div class="alert alert-error">{{ error }}</div>
-      {% endif %}
+        {% if error %}
+        <div class="alert alert-error">{{ error }}</div>
+        {% endif %}
 
-      <form method="POST" action="{{ url_for('login_validation') }}" autocomplete="on">
-        <div class="field" style="margin-bottom:0.85rem;">
-          <label for="username">Email</label>
-          <input id="username" type="email" name="username" placeholder="you@example.com" required autofocus>
+        <form class="auth-form" method="POST" action="{{ url_for('login_validation') }}" autocomplete="on">
+          <div class="field">
+            <label for="username">Email</label>
+            <input id="username" type="email" name="username" placeholder="you@example.com" required autofocus>
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password" placeholder="Enter password" required>
+          </div>
+          <button class="btn btn-primary btn-block" type="submit">Enter workspace</button>
+        </form>
+
+        <div class="demo-note">
+          <span class="demo-label">Demo login</span>
+          <div class="demo-row"><span>Email</span><code>priyansh@gmail.com</code></div>
+          <div class="demo-row"><span>Password</span><code>priyansh</code></div>
         </div>
-        <div class="field" style="margin-bottom:0.85rem;">
-          <label for="password">Password</label>
-          <input id="password" type="password" name="password" placeholder="Enter password" required>
-        </div>
-        <button class="btn btn-primary" type="submit">Enter workspace</button>
-      </form>
-
-      <div class="demo-note">
-        Demo login<br>
-        Email <code>priyansh@gmail.com</code><br>
-        Password <code>priyansh</code>
       </div>
     </section>
   </div>

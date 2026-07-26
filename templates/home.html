@@ -4,16 +4,16 @@
 {% block body %}
 <main class="page">
   <div class="shell">
-    <div class="page-head">
+    <header class="page-head">
       <div class="page-kicker">
-        <span class="status"><span class="dot"></span> model online</span>
+        <span class="status"><span class="dot" aria-hidden="true"></span> model online</span>
         <span class="meta-tag">{{ model_meta.name }}</span>
         <span class="meta-tag">{{ model_meta.vectorizer }}</span>
         <span class="meta-tag">{{ model_meta.classes }} classes</span>
       </div>
       <h1>Run condition prediction</h1>
       <p>Paste symptoms as free text — that’s the only model feature. Patient fields are logged with the run; they don’t affect the classifier.</p>
-    </div>
+    </header>
 
     <div class="workspace">
       <section class="surface">
@@ -69,24 +69,24 @@
       <aside class="side-stack">
         <div class="model-side">
           <div class="side-label">Loaded pipeline</div>
-          <h3>{{ model_meta.name }}</h3>
-          <dl class="model-rows">
-            <div>
-              <dt>vectorizer</dt>
-              <dd>{{ model_meta.vectorizer }}</dd>
+          <h3 class="model-name" title="{{ model_meta.name }}">{{ model_meta.name }}</h3>
+          <div class="model-rows">
+            <div class="model-row">
+              <span>vectorizer</span>
+              <strong>{{ model_meta.vectorizer }}</strong>
             </div>
-            <div>
-              <dt>classes</dt>
-              <dd>{{ model_meta.classes }}</dd>
+            <div class="model-row">
+              <span>classes</span>
+              <strong>{{ model_meta.classes }}</strong>
             </div>
-            <div>
-              <dt>task</dt>
-              <dd>text → condition</dd>
+            <div class="model-row">
+              <span>task</span>
+              <strong>text → condition</strong>
             </div>
-          </dl>
+          </div>
         </div>
 
-        <div class="surface">
+        <div class="surface pipe-card">
           <div class="surface-head">
             <span>Pipeline</span>
           </div>
