@@ -3,8 +3,12 @@ import os
 import csv
 import joblib
 import numpy as np
-import pandas as pd
 import re
+
+_NLTK_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "nltk_data")
+if os.path.isdir(_NLTK_DIR):
+    os.environ["NLTK_DATA"] = _NLTK_DIR
+
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 from datetime import datetime
@@ -50,31 +54,41 @@ MODEL_META = {
 def build_top_drugs_map(csv_path: str) -> dict:
     """Precompute condition -> top-5 drugs once (avoids scanning 79MB CSV per request)."""
     if os.path.exists(DRUG_CACHE_PATH):
-        cache = pd.read_csv(DRUG_CACHE_PATH)
         mapping = defaultdict(list)
-        for _, row in cache.iterrows():
-            mapping[str(row["condition"])].append(str(row["drugName"]))
+        with open(DRUG_CACHE_PATH, newline="", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                mapping[str(row["condition"])].append(str(row["drugName"]))
         return dict(mapping)
 
-    df = pd.read_csv(
-        csv_path,
-        usecols=["drugName", "condition", "rating", "usefulCount"],
-        low_memory=False,
-    )
-    df = df.dropna(subset=["condition", "drugName"])
-    df = df[(df["rating"] >= 9) & (df["usefulCount"] >= 100)]
-    df = df.sort_values(["condition", "rating", "usefulCount"], ascending=[True, False, False])
+    groups = defaultdict(list)
+    with open(csv_path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            condition = (row.get("condition") or "").strip()
+            drug = (row.get("drugName") or "").strip()
+            if not condition or not drug:
+                continue
+            try:
+                rating = float(row["rating"])
+                useful = float(row["usefulCount"])
+            except (TypeError, ValueError):
+                continue
+            if rating >= 9 and useful >= 100:
+                groups[condition].append((rating, useful, drug))
 
     rows = []
     mapping = {}
-    for condition, group in df.groupby("condition", sort=False):
-        # unique drug names preserving rating order
-        drugs = list(dict.fromkeys(group["drugName"].tolist()))[:5]
-        mapping[str(condition)] = drugs
+    for condition, items in groups.items():
+        items.sort(key=lambda item: (item[0], item[1]), reverse=True)
+        drugs = list(dict.fromkeys(drug for _, _, drug in items))[:5]
+        mapping[condition] = drugs
         for drug in drugs:
             rows.append({"condition": condition, "drugName": drug})
 
-    pd.DataFrame(rows).to_csv(DRUG_CACHE_PATH, index=False)
+    os.makedirs(os.path.dirname(DRUG_CACHE_PATH) or ".", exist_ok=True)
+    with open(DRUG_CACHE_PATH, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=["condition", "drugName"])
+        writer.writeheader()
+        writer.writerows(rows)
     return mapping
 
 

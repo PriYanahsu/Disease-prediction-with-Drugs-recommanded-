@@ -1,0 +1,12 @@
+Project Jupyter
+**/*.ipynb
+data/drugsComTrain_raw.csv
+model/passmodel.pkl
+model/passmodel2.pkl
+model/passmodel3.pkl
+model/tfidfvectorizer.pkl
+model/tfidfvectorizer2.pkl
+model/tfidfvectorizer3.pkl
+temp_rem
+.venv
+.git
