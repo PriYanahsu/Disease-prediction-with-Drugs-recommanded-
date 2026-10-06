@@ -9,6 +9,7 @@
     }
   });
 
+  
   const overlay = document.getElementById("predict-overlay");
   const form = document.getElementById("predict-form");
   const submitBtn = document.getElementById("predict-submit");
